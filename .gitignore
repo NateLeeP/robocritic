@@ -1,2 +1,4 @@
 dev-venv/
 venv/
+.env
+flyway.toml

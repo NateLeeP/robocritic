@@ -1,0 +1,22 @@
+version: '3'
+services:
+  flyway:
+    container_name: flyway
+    image: flyway/flyway
+    command: repair
+    volumes:
+      - ./migrations:/flyway/sql
+      - ./flyway-conf:/flyway/conf
+    depends_on:
+      - db
+  db:
+    container_name: db
+    image: mysql:8.0
+    env_file: .env
+    volumes:
+      - robocritic-db-volume:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - 3306:3306
+volumes:
+  robocritic-db-volume:
