@@ -2,3 +2,4 @@ dev-venv/
 venv/
 .env
 flyway.toml
+flyway.conf

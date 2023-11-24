@@ -2,8 +2,8 @@ version: '3'
 services:
   flyway:
     container_name: flyway
-    image: flyway/flyway
-    command: repair
+    image: dhoer/flyway
+    command: info
     volumes:
       - ./migrations:/flyway/sql
       - ./flyway-conf:/flyway/conf
