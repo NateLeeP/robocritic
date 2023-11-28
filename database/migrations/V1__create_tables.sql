@@ -1,5 +1,5 @@
 CREATE TABLE `review` (
-  `id` integer PRIMARY KEY AUTOINCREMENT,
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
   `url` varchar(255),
   `robo_score` decimal(2,1),
   `reviewer_id` integer,
@@ -10,7 +10,7 @@ CREATE TABLE `review` (
 );
 
 CREATE TABLE `publisher` (
-  `id` integer PRIMARY KEY AUTOINCREMENT,
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
   `publisher_name` varchar(255),
   `publisher_domain_name` varchar(255),
   `created_at` timestamp DEFAULT CURRENT_TIMESTAMP
