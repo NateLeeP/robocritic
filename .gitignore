@@ -3,3 +3,5 @@ venv/
 .env
 flyway.toml
 flyway.conf
+*/__pycache__
+*/.ipynb_checkpoints/*
