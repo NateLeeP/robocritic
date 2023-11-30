@@ -1,0 +1,9 @@
+ALTER TABLE game MODIFY id int auto_increment;
+ALTER TABLE genre modify id int auto_increment;
+ALTER TABLE genre_game modify id int auto_increment;
+ALTER TABLE platform modify id int auto_increment;
+ALTER TABLE platform_game modify id int auto_increment;
+ALTER TABLE publisher modify id int auto_increment;
+ALTER TABLE review modify id int auto_increment;
+ALTER TABLE review_con modify id int auto_increment;
+ALTER TABLE review_pro modify id int auto_increment;
