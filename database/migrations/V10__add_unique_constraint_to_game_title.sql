@@ -1,0 +1,2 @@
+ALTER TABLE game
+ADD CONSTRAINT Unique_Game UNIQUE (title);
