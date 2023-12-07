@@ -3,6 +3,25 @@
 from mysql.connector import Error
 
 
+def create_game(connection, game):
+    # Accepts a db connection and a game object.
+    # Game is a dictionary with the following keys:
+    # name, release_date. Relase date formate: YYYY-MM-DD
+    create_game_query = "INSERT INTO game (title, release_date) VALUES (%s, %s)"
+    cursor = connection.cursor()
+    try:
+        cursor.execute(
+            create_game_query,
+            (
+                game["title"],
+                game["release_date"],
+            ),
+        )
+        connection.commit()
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+
 def create_review(connection, review):
     # Accepts a db connection and a review object.
     # Review is a dictionary with the following keys:
@@ -54,6 +73,21 @@ def write_review_cons_to_db(connection, list_of_cons):
     cursor = connection.cursor()
     try:
         cursor.executemany(create_cons_query, list_of_cons)
+        connection.commit()
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+
+def write_platform_to_db(connection, platform_name):
+    """
+    Uses a db connection to write a single platform to the database.
+
+    platform: platform name to insert. Name will be Xbox One, Xbox X, PS5, etc.
+    """
+    platform_write_query = "INSERT INTO platform (platform_name) VALUES (%s)"
+    cursor = connection.cursor()
+    try:
+        cursor.execute(platform_write_query, (platform_name,))
         connection.commit()
     except Error as e:
         print(f"The error '{e}' occurred")
