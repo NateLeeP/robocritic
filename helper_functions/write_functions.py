@@ -18,8 +18,9 @@ def create_game(connection, game):
             ),
         )
         connection.commit()
+        return cursor.lastrowid
     except Error as e:
-        print(f"The error '{e}' occurred")
+        print(f"The error '{e}' occurred. Game failed to create")
 
 
 def create_review(connection, review):
@@ -40,8 +41,9 @@ def create_review(connection, review):
             ),
         )
         connection.commit()
+        return cursor.lastrowid
     except Error as e:
-        print(f"The error '{e}' occurred")
+        print(f"The error '{e}' occurred. Review could not be created")
 
 
 def write_review_pros_to_db(connection, list_of_pros):

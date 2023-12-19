@@ -42,3 +42,19 @@ def get_game_by_title(connection, title):
         print(f"The error '{e}' occurred")
 
     return game
+
+
+def get_review_by_game_id_and_publisher_id(connection, game_id, publisher_id):
+    """
+    Return the review with given game_id and publisher id
+    """
+    cursor = connection.cursor()
+    query = "SELECT * FROM review WHERE game_id = %s AND publisher_id = %s"
+    review = None
+    try:
+        cursor.execute(query, (game_id, publisher_id))
+        review = cursor.fetchone()
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+    return review
