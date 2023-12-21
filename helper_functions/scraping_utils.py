@@ -39,3 +39,25 @@ def get_latest_reviews_from_ign():
     )
 
     return mapped_latest_reviews
+
+
+def get_game_review_content_from_ign(url):
+    """
+    Accepts a game review url and returns a string
+    with the game review content.
+    Catches error if request fails and returns None.
+
+    Returns:
+        "content" of type 'str'.
+    """
+    try:
+        response = requests.get(url, headers=header_mapping)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print(e)
+        print(f"Request failed with url: {url}")
+        return None
+    soup = BeautifulSoup(response.content, "html.parser")
+    articles = soup.find_all("p")
+    content = "".join(list(map(lambda x: x.get_text(), articles)))
+    return content
