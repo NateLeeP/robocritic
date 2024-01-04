@@ -44,7 +44,7 @@ class IGDBService:
         release_date = datetime.utcfromtimestamp(unix_time)
         return release_date.date()
 
-    def get_release_date_id_by_title(self, title):
+    def get_first_release_date_by_title(self, title):
         """
         Returns the IGDB release data id from the associated game title.
         Returns the last release date in array.
