@@ -27,9 +27,7 @@ def create_review(connection, review):
     # Accepts a db connection and a review object.
     # Review is a dictionary with the following keys:
     # url, game_id, publisher_id
-    create_review_query = (
-        "INSERT INTO review (url, game_id, publisher_id) VALUES (%s, %s, %s)"
-    )
+    create_review_query = "INSERT INTO review (url, game_id, publisher_id, robo_score) VALUES (%s, %s, %s, %s)"
     cursor = connection.cursor()
     try:
         cursor.execute(
@@ -38,6 +36,7 @@ def create_review(connection, review):
                 review["url"],
                 review["game_id"],
                 review["publisher_id"],
+                review["robo_score"],
             ),
         )
         connection.commit()
