@@ -40,3 +40,48 @@ class OpenAIService:
         pros_cons_json = json.loads(completion.choices[0].message.content)
 
         return pros_cons_json
+
+    def assign_score_to_content(self, content):
+        """
+        Content should be a string with game review content.
+
+        Returns a dictionary with an 'score' key and an int value.
+
+        """
+
+        completion = self.client.chat.completions.create(
+            model="gpt-3.5-turbo-1106",
+            response_format={"type": "json_object"},
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant, designed to analyze video game reviews and return a score out of 10.",
+                },
+                {
+                    "role": "system",
+                    "content": "You will output your response as a single digit number between one and ten. The response output will be a JSON with field 'score'",
+                },
+                {
+                    "role": "system",
+                    "content": "The score outputed must be a single digit number between one and ten",
+                },
+                {
+                    "role": "system",
+                    "content": "The score given will be based on the contents of the review. A higher score will be given if a review has positive sentiment, and lower if a review has more negative sentiment",
+                },
+                {"role": "user", "content": content},
+            ],
+        )
+        print(
+            f"Completion usage: Completion tokens: {completion.usage.completion_tokens}"
+        )
+        print(f"Completion usage: Prompt tokens: {completion.usage.prompt_tokens}")
+
+        print(f"OpenAI finish reasons: {completion.choices[0].finish_reason} ")
+
+        scores_json = json.loads(completion.choices[0].message.content)
+
+        if not scores_json or type(scores_json.get("score")) is not int:
+            raise TypeError("Invalid JSON response: 'score' value is not an int")
+
+        return scores_json
