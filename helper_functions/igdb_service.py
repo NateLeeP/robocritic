@@ -69,6 +69,10 @@ class IGDBService:
             # Will raise an error for empty response
             raise ValueError(f"No game found with title '{title}'")
         game = response.json()[0]
-        release_date_unix = game["first_release_date"]
-        release_date = datetime.utcfromtimestamp(release_date_unix).date()
-        return release_date
+        try:
+            release_date_unix = game["first_release_date"]
+            release_date = datetime.utcfromtimestamp(release_date_unix).date()
+            return release_date
+        except KeyError as e:
+            print(e)
+            raise ValueError(f"No release date found with title '{title}'")
