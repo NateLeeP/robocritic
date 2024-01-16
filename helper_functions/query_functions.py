@@ -41,7 +41,7 @@ class GameReleaseDate:
             return response
         except botocore.exceptions.ClientError as error:
             if error.response["Error"]["Code"] == "ConditionalCheckFailedException":
-                print("Item already exists")
+                print(f"Item already exists {release_date_game_title}")
             return error.response
 
 
@@ -52,6 +52,24 @@ class Reviews:
 
     def __init__(self):
         self.dynamodb_client = boto3.client("dynamodb")
+
+    def get_review_by_game_title_and_reviewer_name(
+        self, game_title, review_publisher_name
+    ):
+        """
+        Returns a single review for a given game title and reviewer name.
+
+        If no review exists, returns None
+        """
+        response = self.dynamodb_client.query(
+            TableName="Reviews",
+            KeyConditionExpression="GameTitle = :val1 AND ReviewPublisherName = :val2",
+            ExpressionAttributeValues={
+                ":val1": {"S": game_title},
+                ":val2": {"S": review_publisher_name},
+            },
+        )
+        return response["Items"][0] if len(response["Items"]) != 0 else None
 
     def get_all_reviews_by_game_title(self, game_title):
         """
@@ -113,10 +131,14 @@ class Reviews:
                     list(map(lambda x: {"S": x}, list_of_cons)),
                     str(roboscore),
                 ),
+                ConditionExpression="attribute_not_exists(GameTitle)",
             )
             return response
         except botocore.exceptions.ClientError as error:
-            print(f"The error '{error.response['Error']['Message']}' occurred")
+            if error.response["Error"]["Code"] == "ConditionalCheckFailedException":
+                print(
+                    f"Item already exists with title {game_title} and reviewer {review_publisher_name}"
+                )
             return error.response
 
 
