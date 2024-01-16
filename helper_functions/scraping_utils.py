@@ -38,7 +38,12 @@ def get_latest_reviews_from_ign():
         )
     )
 
-    return mapped_latest_reviews
+    # filter out board games
+    video_game_reviews = list(
+        filter(lambda x: "Board Game" not in x["title"], mapped_latest_reviews)
+    )
+
+    return video_game_reviews
 
 
 def get_game_review_content_from_ign(url):
