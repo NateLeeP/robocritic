@@ -50,6 +50,7 @@ class IGDBService:
         Returns the last release date in array.
         Returning the first release date resulted in beta / demo release dates
         being returned.
+        Returns datetime 'date' object.
         """
         try:
             request_data = (
@@ -63,8 +64,8 @@ class IGDBService:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             print(e)
-            print(f"Request failed with data: {request_data}")
-            return None
+            print(f"IGDB API Request failed with data: {request_data}")
+            raise requests.exceptions.HTTPError(f"IGDB API Request failed")
         if not response.json():
             # Will raise an error for empty response
             raise ValueError(f"No game found with title '{title}'")
