@@ -1,15 +1,20 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+import logging
 
 ign_latest_reviews_url = "https://www.ign.com/reviews/games"
 header_mapping = {"User-Agent": "Mac Firefox"}
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def get_latest_reviews_from_ign():
     """
     Returns list of latest game review from IGN.
-    Returns the 10 latest reviews.
+    "Latest" determined by games at reviews/games url,
+    that are NOT board games.
     List will be an array of dictionary objects with a 'title' and 'href' key.
 
     """
@@ -60,9 +65,8 @@ def get_game_review_content_from_ign(url):
         response = requests.get(url, headers=header_mapping)
         response.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        print(e)
-        print(f"Request failed with url: {url}")
-        return None
+        logger.error(e)
+        raise requests.exceptions.HTTPError(f"HTTP Request failed with url: {url}")
     soup = BeautifulSoup(response.content, "html.parser")
     articles = soup.find_all("p")
     content = "".join(list(map(lambda x: x.get_text(), articles)))
@@ -85,9 +89,9 @@ def get_game_release_date_from_metacritic(game_title):
         )
         response.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        print(e)
+        logger.error(e)
         raise requests.exceptions.HTTPError(
-            f"Request failed with url: https://www.metacritic.com/browse/games/{game_title}"
+            f"HTTP Request failed with url: https://www.metacritic.com/browse/games/{game_title}"
         )
     soup = BeautifulSoup(response.content, "html.parser")
     try:
@@ -99,7 +103,7 @@ def get_game_release_date_from_metacritic(game_title):
         release_date = datetime.strptime(release_date, "%b %d, %Y").date()
         return release_date
     except Exception as e:
-        print(e)
+        logger.error(e)
         raise ValueError(
             f"Failed to parse html content from metacritic for game title: {game_title}"
         )

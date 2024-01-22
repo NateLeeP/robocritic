@@ -2,8 +2,11 @@ from dotenv import load_dotenv
 import os
 import requests
 from datetime import datetime
+import logging
 
 load_dotenv()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 class IGDBService:
@@ -23,7 +26,7 @@ class IGDBService:
         try:
             release_date_id = self.get_release_date_id_by_title(title)
         except ValueError as e:
-            print(e)
+            logger.error(e)
             return None
         try:
             request_data = f"fields date; where id = {release_date_id};"
@@ -34,8 +37,8 @@ class IGDBService:
             )
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            print(e)
-            print(f"Request failed with data: {request_data}")
+            logger.error(e)
+            logger.error(f"HTTP Request failed with data: {request_data}")
             return None
 
         if not response.json():
@@ -63,17 +66,17 @@ class IGDBService:
             )
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            print(e)
-            print(f"IGDB API Request failed with data: {request_data}")
+            logger.error(e)
+            logger.error(f"IGDB API Request failed with data: {request_data}")
             raise requests.exceptions.HTTPError(f"IGDB API Request failed")
         if not response.json():
             # Will raise an error for empty response
-            raise ValueError(f"No game found with title '{title}'")
+            raise ValueError(f"No game found from IGDB API with title '{title}'")
         game = response.json()[0]
         try:
             release_date_unix = game["first_release_date"]
             release_date = datetime.utcfromtimestamp(release_date_unix).date()
             return release_date
         except KeyError as e:
-            print(e)
+            logger.error(e)
             raise ValueError(f"No release date found with title '{title}'")
