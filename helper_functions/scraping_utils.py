@@ -37,7 +37,10 @@ def get_latest_reviews_from_ign():
     mapped_latest_reviews = list(
         map(
             lambda x: {
-                "title": x.get("aria-label").rstrip("Review").rstrip(),
+                "title": x.get("aria-label")
+                .split("Early Access")[0]
+                .rstrip("Review")
+                .rstrip(),
                 "href": x.get("href"),
             },
             filtered_a_tags,

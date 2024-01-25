@@ -85,3 +85,10 @@ class OpenAIService:
             raise TypeError("Invalid JSON response: 'score' value is not an int")
 
         return scores_json
+
+    def health_check(self):
+        completion = self.client.chat.completions.create(
+            model="gpt-3.5-turbo-1106",
+            messages=[{"role": "user", "content": "Say this is a test!"}],
+        )
+        return completion.choices[0].message.content

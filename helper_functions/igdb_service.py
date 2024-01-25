@@ -1,21 +1,20 @@
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import os
 import requests
 from datetime import datetime
 import logging
 
-load_dotenv()
+# load_dotenv()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
 class IGDBService:
-    def __init__(self, connection):
-        self.connection = connection
+    def __init__(self):
         self.base_url = "https://api.igdb.com/v4"
         self.headers = {
-            "Authorization": f"Bearer {os.getenv('IGDB_BEARER_TOKEN')}",
-            "Client-ID": os.getenv("IGDB_CLIENT_ID"),
+            "Authorization": f"Bearer {os.environ['IGDB_BEARER_TOKEN']}",
+            "Client-ID": os.environ["IGDB_CLIENT_ID"],
         }
 
     def get_game_release_date_by_title(self, title):
