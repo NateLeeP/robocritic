@@ -3,5 +3,11 @@ venv/
 .env
 flyway.toml
 flyway.conf
-*/__pycache__
+*/__pycache__/*
 */.ipynb_checkpoints/*
+notebooks/.ipynb_checkpoints/*
+notebooks/.ipynb_checkpoints/reviews-ETL-checkpoint.ipynb
+etl/.DS_Store
+etl/__pycache__/*
+/__pycache__/*
+.DS_Store
