@@ -21,7 +21,7 @@ class GameReleaseDate:
         )
         return response["Items"]
 
-    def write_item(self, release_date_game_title):
+    def write_item(self, release_date_game_title, game_art_url):
         """
         Writes a new item to the GameRleaseDate DynamoDB table.
 
@@ -34,6 +34,7 @@ class GameReleaseDate:
                 Item={
                     "SortByReleaseDate": {"N": "1"},
                     "ReleaseDate_GameTitle": {"S": release_date_game_title},
+                    "GameArtURL": {"S": game_art_url},
                 },
                 ConditionExpression="attribute_not_exists(SortByReleaseDate)",
             )
