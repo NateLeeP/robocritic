@@ -6,6 +6,7 @@ from helper_functions.scraping_utils import (
     get_latest_reviews_from_ign,
     get_game_review_content_from_ign,
     get_game_release_date_from_metacritic,
+    get_game_art_from_ign,
 )
 import logging
 
@@ -75,8 +76,17 @@ def handler(event, context):
         logger.info(game_release_date)
         logger.info(game_release_date + "_" + game_title)
 
+        # Get game art
+        try:
+            game_art_url = get_game_art_from_ign(game_title)
+        except requests.exceptions.HTTPError as e:
+            logger.error(e)
+        except ValueError as e:
+            logger.error(e)
+
+        release_date_game_title = game_release_date + "_" + game_title
         # Write game to DB.
-        GameReleaseDate().write_item(game_release_date + "_" + game_title)
+        GameReleaseDate().write_item(release_date_game_title, game_art_url)
 
         logger.info(f"Writing review to db for {review['title']}")
         # Scrape review from site.
