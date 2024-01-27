@@ -39,7 +39,7 @@ def get_latest_reviews_from_ign():
             lambda x: {
                 "title": x.get("aria-label")
                 .split("Early Access")[0]
-                .rstrip("Review")
+                .split("Review")[0]
                 .rstrip(),
                 "href": x.get("href"),
             },
@@ -109,4 +109,35 @@ def get_game_release_date_from_metacritic(game_title):
         logger.error(e)
         raise ValueError(
             f"Failed to parse html content from metacritic for game title: {game_title}"
+        )
+
+
+def get_game_art_from_ign(game_title):
+    """
+    Accepts a game title and returns a string with the game art. If error is thrown, return none.
+
+    Returns:
+        URL to image.
+    """
+    try:
+        formatted_game_title = (
+            game_title.lower().replace(":", "").replace("'", "").replace(" ", "-")
+        )
+        response = requests.get(
+            f"https://www.ign.com/games/{formatted_game_title}", headers=header_mapping
+        )
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        logger.error(e)
+        raise requests.exceptions.HTTPError(
+            f"HTTP Request failed with url: https://www.ign.com/games/{formatted_game_title}"
+        )
+    soup = BeautifulSoup(response.content, "html.parser")
+    try:
+        artwork_url = soup.find(alt=game_title).get("src")
+        return artwork_url
+    except Exception as e:
+        logger.error(e)
+        raise ValueError(
+            f"Failed to parse artwork from ign for game title: {game_title}"
         )
