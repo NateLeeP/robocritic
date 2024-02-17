@@ -21,7 +21,7 @@ class GameReleaseDate:
         )
         return response["Items"]
 
-    def write_item(self, release_date_game_title, game_art_url):
+    def write_item(self, game_release_date, game_title, game_art_url):
         """
         Writes a new item to the GameRleaseDate DynamoDB table.
 
@@ -29,12 +29,20 @@ class GameReleaseDate:
         Returns HTTP response object returned by AWS.
         """
         try:
+            release_date_game_title = game_release_date + "_" + game_title
             response = self.dynamodb_client.put_item(
                 TableName="GamesReleaseDate",
                 Item={
                     "SortByReleaseDate": {"N": "1"},
                     "ReleaseDate_GameTitle": {"S": release_date_game_title},
                     "GameArtURL": {"S": game_art_url},
+                    "URLPath": {
+                        "S": game_title.lower()
+                        .replace(":", "")
+                        .replace("'", "")
+                        .replace(" ", "-")
+                        .replace(".", "")
+                    },
                 },
                 ConditionExpression="attribute_not_exists(SortByReleaseDate)",
             )
@@ -139,4 +147,40 @@ class Reviews:
                 print(
                     f"Item already exists with title {game_title} and reviewer {review_publisher_name}"
                 )
+            return error.response
+
+
+class URLGameTitle:
+    """
+    Class for querying the URLGameTitle DynamoDB table.
+    """
+
+    def __init__(self):
+        self.dynamodb_client = boto3.client("dynamodb")
+        self.url_game_title_table = "URLGameTitle"
+
+    def write_item(self, game_title):
+        """
+        Writes a new item to the URLGameTitle DynamoDB table.
+        Returns HTTP response object returned by AWS.
+        """
+        try:
+            response = self.dynamodb_client.put_item(
+                TableName=self.url_game_title_table,
+                Item={
+                    "GameTitle": {"S": game_title},
+                    "URLPath": {
+                        "S": game_title.lower()
+                        .replace(":", "")
+                        .replace("'", "")
+                        .replace(" ", "-")
+                        .replace(".", "")
+                    },
+                },
+                ConditionExpression="attribute_not_exists(URLPath)",
+            )
+            return response
+        except botocore.exceptions.ClientError as error:
+            if error.response["Error"]["Code"] == "ConditionalCheckFailedException":
+                print(f"Item already exists {game_title}")
             return error.response

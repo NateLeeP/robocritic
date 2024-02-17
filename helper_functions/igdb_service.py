@@ -42,6 +42,7 @@ class IGDBService:
 
         if not response.json():
             raise ValueError(f"No release date found with title '{title}'")
+        response.json().sort(key=lambda x: x["id"], reverse=True)
         unix_time = response.json()[0]["date"]
         release_date = datetime.utcfromtimestamp(unix_time)
         return release_date.date()
@@ -71,7 +72,9 @@ class IGDBService:
         if not response.json():
             # Will raise an error for empty response
             raise ValueError(f"No game found from IGDB API with title '{title}'")
-        game = response.json()[0]
+
+        games = sorted(response.json(), key=lambda x: x["id"], reverse=True)
+        game = games[0]
         try:
             release_date_unix = game["first_release_date"]
             release_date = datetime.utcfromtimestamp(release_date_unix).date()

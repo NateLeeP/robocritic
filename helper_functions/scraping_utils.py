@@ -39,6 +39,7 @@ def get_latest_reviews_from_ign():
             lambda x: {
                 "title": x.get("aria-label")
                 .split("Early Access")[0]
+                .split("Final")[0]
                 .split("Review")[0]
                 .rstrip(),
                 "href": x.get("href"),
@@ -55,14 +56,14 @@ def get_latest_reviews_from_ign():
     return video_game_reviews
 
 
-def get_game_review_content_from_ign(url):
+def get_game_review_soup_from_ign(url):
     """
     Accepts a game review url and returns a string
     with the game review content.
     Catches error if request fails and returns None.
 
     Returns:
-        "content" of type 'str'.
+        A soup object with the game review content.
     """
     try:
         response = requests.get(url, headers=header_mapping)
@@ -71,9 +72,24 @@ def get_game_review_content_from_ign(url):
         logger.error(e)
         raise requests.exceptions.HTTPError(f"HTTP Request failed with url: {url}")
     soup = BeautifulSoup(response.content, "html.parser")
-    articles = soup.find_all("p")
-    content = "".join(list(map(lambda x: x.get_text(), articles)))
-    return content
+    return soup
+
+
+def parse_review_content_from_ign_article(soup):
+    """
+    Accepts a BeautifulSoup object scraped from an IGN game review article
+    and returns a string with the game review content.
+
+    """
+    try:
+        articles = soup.find_all("p")
+        content = "".join(list(map(lambda x: x.get_text(), articles)))
+        return content
+    except Exception as e:
+        logger.error(e)
+        raise ValueError(
+            f"Failed to parse html review content from IGN for soup: {soup}"
+        )
 
 
 def get_game_release_date_from_metacritic(game_title):
@@ -112,29 +128,28 @@ def get_game_release_date_from_metacritic(game_title):
         )
 
 
-def get_game_art_from_ign(game_title):
+def get_game_art_from_ign(game_title, game_page_url):
     """
-    Accepts a game title and returns a string with the game art. If error is thrown, return none.
+    Accepts a Beautiful Soup object generated from the html of an IGN review page
+    and returns a string with the game art.
+    The soup object will have
 
     Returns:
         URL to image.
     """
     try:
-        formatted_game_title = (
-            game_title.lower().replace(":", "").replace("'", "").replace(" ", "-")
-        )
         response = requests.get(
-            f"https://www.ign.com/games/{formatted_game_title}", headers=header_mapping
+            f"https://www.ign.com{game_page_url}", headers=header_mapping
         )
         response.raise_for_status()
     except requests.exceptions.HTTPError as e:
         logger.error(e)
         raise requests.exceptions.HTTPError(
-            f"HTTP Request failed with url: https://www.ign.com/games/{formatted_game_title}"
+            f"HTTP Request failed with url: https://www.ign.com{game_page_url}"
         )
     soup = BeautifulSoup(response.content, "html.parser")
     try:
-        artwork_url = soup.find(alt=game_title).get("src")
+        artwork_url = soup.find(class_="progressive-image").get("src")
         return artwork_url
     except Exception as e:
         logger.error(e)
