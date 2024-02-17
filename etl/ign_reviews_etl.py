@@ -1,12 +1,13 @@
 import requests
-from helper_functions.dynamodb_services import GameReleaseDate, Reviews
+from helper_functions.dynamodb_services import GameReleaseDate, Reviews, URLGameTitle
 from helper_functions.igdb_service import IGDBService
 from helper_functions.openai_service import OpenAIService
 from helper_functions.scraping_utils import (
     get_latest_reviews_from_ign,
-    get_game_review_content_from_ign,
+    get_game_review_soup_from_ign,
     get_game_release_date_from_metacritic,
     get_game_art_from_ign,
+    parse_review_content_from_ign_article,
 )
 import logging
 
@@ -24,8 +25,17 @@ def handler(event, context):
     logger.info(f"OpenAI health check: {OpenAIService().health_check()}")
 
     for review in latest_reviews:
+
         game_title = review["title"]
         logger.info(game_title)
+        review_in_db = Reviews().get_review_by_game_title_and_reviewer_name(
+            game_title=game_title, review_publisher_name="IGN"
+        )
+        if review_in_db:
+            # if review does not exist, continue to next in loop.
+            logger.info(f"Review found for game {game_title} published by IGN")
+            continue
+
         game_release_date = None
         try:
             game_release_date = (
@@ -39,30 +49,10 @@ def handler(event, context):
             logger.error(e)
 
         if not game_release_date:
-            # Try pulling release date with refactored game title
-            # Drop 'Early Access' text from game title - IGN includes it.
-            formatted_game_title = game_title.split("Early Access")[0].rstrip()
-            try:
-                logger.info(
-                    "Querying IGDB for game release date with formatted game title"
-                )
-                game_release_date = (
-                    IGDBService()
-                    .get_first_release_date_by_title(formatted_game_title)
-                    .strftime("%Y-%m-%d")
-                )
-            except requests.exceptions.HTTPError as e:
-                logger.error(e)
-            except ValueError as e:
-                logger.error(e)
-
-        if not game_release_date:
             # if pulling release_date from igdb service failed, try metacritic
             try:
                 logger.info("Querying metacritic for game release date")
-                game_release_date = get_game_release_date_from_metacritic(
-                    formatted_game_title
-                )
+                game_release_date = get_game_release_date_from_metacritic(game_title)
                 game_release_date = game_release_date.strftime("%Y-%m-%d")
             except requests.exceptions.HTTPError as e:
                 logger.error(e)
@@ -76,34 +66,39 @@ def handler(event, context):
         logger.info(game_release_date)
         logger.info(game_release_date + "_" + game_title)
 
-        # Get game art
+        # Get BeautifulSoup object of review page from IGN
+        review_page_soup = None
         try:
-            game_art_url = get_game_art_from_ign(game_title)
+            review_url = "https://www.ign.com" + review["href"]
+            logger.info(f"Scrape review from {review_url}")
+            review_page_soup = get_game_review_soup_from_ign(review_url)
+        except requests.exceptions.HTTPError as e:
+            logger.error(e)
+
+        # Get game art
+        game_art_url = None
+        try:
+            game_page_url = review_page_soup.find(
+                "a", class_="article-object-link"
+            ).get("href")
+            game_art_url = get_game_art_from_ign(game_title, game_page_url)
         except requests.exceptions.HTTPError as e:
             logger.error(e)
         except ValueError as e:
             logger.error(e)
 
-        release_date_game_title = game_release_date + "_" + game_title
         # Write game to DB.
-        GameReleaseDate().write_item(release_date_game_title, game_art_url)
+        GameReleaseDate().write_item(game_release_date, game_title, game_art_url)
+        # Write url path to DB.
+        URLGameTitle().write_item(game_title)
 
         logger.info(f"Writing review to db for {review['title']}")
         # Scrape review from site.
-        # Check if review exists for review.
-        review_in_db = Reviews().get_review_by_game_title_and_reviewer_name(
-            game_title=game_title, review_publisher_name="IGN"
-        )
-        if review_in_db:
-            # if review does not exist, continue to next in loop.
-            logger.info(f"Review found for game {game_title} published by IGN")
-            continue
-
-        review_url = "https://www.ign.com" + review["href"]
-        logger.info(f"Scrape review from {review_url}")
         game_review_content = None
         try:
-            game_review_content = get_game_review_content_from_ign(review_url)
+            game_review_content = parse_review_content_from_ign_article(
+                review_page_soup
+            )
         except requests.exceptions.HTTPError as e:
             logger.error(e)
 
