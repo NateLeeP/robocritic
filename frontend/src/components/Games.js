@@ -1,6 +1,3 @@
-import Link from 'next/link'
-
-
 async function getGames() {
     const response = await fetch("https://g5ql747n3i.execute-api.us-east-1.amazonaws.com/games", { cache: 'no-store' })
 
@@ -15,15 +12,14 @@ async function getGames() {
 export default async function Reviews() {
     const games = await getGames();
     return (
-        <div>
-            <h1>Games</h1>
+        <div className='grid grid-cols-4 gap-4'>
             {
                 games.map((game, index) => (
-                    <div key={index}>
-                        <Link href={`/game/${game.url_path}`}>Click me!</Link>
-                        <h2>{game.game_title}</h2>
-                        <img src={game.game_art_url} />
-                        <p>{game.release_date}</p>
+                    <div key={index} className='p-8 flex flex-col items-center'>
+                        <img src={game.game_art_url} className='w-36 h-36 rounded-2xl' />
+                        <h2 className="font-bold">{game.game_title}</h2>
+                        <p>Release Date: {game.release_date}</p>
+                        <a className="text-black italic underline" href={`/game/${game.url_path}`}>Read Reviews</a>
                     </div>
                 ))
             }
