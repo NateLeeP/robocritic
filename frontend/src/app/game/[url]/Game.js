@@ -15,11 +15,14 @@ async function getGameArtByReleaseDateGameTitle(release_date, game_title) {
     return game
 }
 
+import Review from './Review';
+
 export default async function Game({ url }) {
     const reviews = await getReviewsByGameTitle(url)
     const game = await getGameArtByReleaseDateGameTitle(reviews[0].game_release_date, reviews[0].game_title)
-    return <div>
-        <img src={game.game_art_url} className='w-36 h-36 rounded-2xl' />
-        {reviews.map((review) => <div>{review.game_title} {review.review_publisher_name}</div>)}
+    return <div className="pl-60 pr-40">
+        <h2>{game.game_title}</h2>
+        <img src={game.game_art_url} alt={game.game_title} />
+        {reviews.map((review) => <Review review={review} />)}
     </div>
 }
