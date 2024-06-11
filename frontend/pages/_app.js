@@ -1,6 +1,5 @@
-import '../styles/globals.css'
-
-import RootLayout from '../components/layout'
+import RootLayout from './layout'
+import "../styles/globals.css";
 
 export default function MyApp({ Component, pageProps }) {
     return (
