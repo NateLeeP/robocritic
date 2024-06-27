@@ -8,7 +8,7 @@ export default function RootLayout({ children }) {
     return (
         <div>
             <Banner />
-            <main className={`${inter.className} bg-slate-700`}>{children}</main>
+            <main className={`${inter.className} bg-slate-700 min-h-screen`}>{children}</main>
         </div>
     );
 }
