@@ -3,13 +3,7 @@ import Link from 'next/link'
 
 export default function Games({ games }) {
     // const games = await getGames();
-    const mockData = [
-        { 'game_title': 'Shadow Quest', 'release_date': '2022-11-15', 'url_path': '/games/shadow-quest' },
-        { 'game_title': 'Rise of the Phoenix', 'release_date': '2023-02-20', 'url_path': '/games/rise-of-the-phoenix' },
-        { 'game_title': 'Cyber Drift', 'release_date': '2023-05-30', 'url_path': '/games/cyber-drift' },
-        { 'game_title': 'Mystic Realms', 'release_date': '2023-08-24', 'url_path': '/games/mystic-realms' },
-        { 'game_title': 'Final Frontier', 'release_date': '2023-12-05', 'url_path': '/games/final-frontier' }
-    ];
+
 
     return (
         <div className='grid grid-cols-1 lg:grid-cols-5 sm:grid-cols-3 gap-4'>
