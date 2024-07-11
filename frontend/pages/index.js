@@ -1,13 +1,8 @@
 import Games from '../components/Games.js'
+import { getAllGames } from '../bff_api.js';
 
 export async function getStaticProps() {
-  const response = await fetch("https://g5ql747n3i.execute-api.us-east-1.amazonaws.com/games", { cache: 'no-store' })
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch reviews')
-  }
-
-  const games = await response.json()
+  const games = await getAllGames()
   return { props: { games } }
 }
 export default function Page({ games }) {

@@ -1,22 +1,9 @@
 import Game from '../../components/Game.js'
-import { fetchGameData } from '../../bff_api.js'
+import { fetchGameData, getAllGames } from '../../bff_api.js'
 export async function getStaticPaths() {
-    const paths = [{
-        params: {
-            url: 'f1-24'
-        }
-    },
-    {
-        params: {
-            url: 'capes'
-        }
-    },
-    {
-        params: {
-            url: 'killer-klowns-from-outer-space-the-game'
-        }
-    }
-    ]
+
+    const games = await getAllGames()
+    const paths = games.map((game) => ({params: { url: game.url_path}}))
     return { paths, fallback: false }
 }
 
