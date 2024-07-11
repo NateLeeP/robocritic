@@ -13,3 +13,4 @@ etl/__pycache__/*
 .DS_Store
 .vercel
 .vscode
+/etl/pc_gamer_etl/config.py
