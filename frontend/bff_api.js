@@ -31,7 +31,6 @@ export async function getGameArtByReleaseDateGameTitle(releaseDate, gameTitle) {
 }
 
 export async function fetchGameData(urlPath) {
-    console.log("Fetching game data for url path: " + urlPath)
     const gameTitle = await getGameTitleFromURLPath(urlPath);
     const reviews = await getReviewsByGameTitle(gameTitle);
     const gameArtURL = await getGameArtByReleaseDateGameTitle(reviews[0].game_release_date, gameTitle);
