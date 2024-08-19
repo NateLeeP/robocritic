@@ -1,5 +1,5 @@
 from .base import HTMLParser
-
+import re
 
 class PCGamerReviewsParser(HTMLParser):
     def __init__(self, html_content):
@@ -50,7 +50,7 @@ class PCGamerGameReviewParser(HTMLParser):
         # Combine the text content into one string
         combined_text = ' '.join(text_content)
 
-        return combined_text
+        return combined_text if len(combined_text) > 0 else None
 
     def get_game_title(self):
         """
@@ -59,7 +59,7 @@ class PCGamerGameReviewParser(HTMLParser):
         
         """
         # Find the 'h1' tag with class 'review-title-long'
-        title_tag = self.soup.find('h1', class_='review-title-long')
+        title_tag = self.soup.find('h1', class_=re.compile('^review-title'))
 
         # Extract the text content from the title tag
         game_title = title_tag.get_text()
@@ -67,7 +67,7 @@ class PCGamerGameReviewParser(HTMLParser):
         # Remove the word "review" from the end of the game title
         game_title = game_title.replace("review", "").strip()
 
-        return game_title
+        return game_title if len(game_title) > 0 else None
 
     def get_reviewer_name(self):
         author_tag = self.soup.find('span', class_="author-byline__author-name")
