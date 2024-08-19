@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS game (
 
 CREATE TABLE IF NOT EXISTS platform (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    platform_name VARCHAR(50) NOT NULL
+    platform_name VARCHAR(50) UNIQUE NOT NULL,
+    platform_abbreviation VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS platform_game (
@@ -25,7 +26,7 @@ CREATE TABLE IF NOT EXISTS platform_game (
 
 CREATE TABLE IF NOT EXISTS publisher (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    publisher_name VARCHAR(50) NOT NULL,
+    publisher_name VARCHAR(50) UNIQUE NOT NULL,
     publisher_domain_name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -34,6 +35,7 @@ create table IF NOT EXISTS reviewer (
     id INT AUTO_INCREMENT PRIMARY KEY,
     reviewer_full_name VARCHAR(100) NOT NULL,
     publisher_id INT NOT NULL,
+    reviewer_bio_url VARCHAR(100),
     FOREIGN KEY (publisher_id) REFERENCES publisher(id)
 );
 

@@ -14,3 +14,4 @@ etl/__pycache__/*
 .vercel
 .vscode
 /etl/pc_gamer_etl/config.py
+etl/helper_functions/__pycache__/*
