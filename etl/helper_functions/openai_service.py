@@ -8,7 +8,7 @@ class OpenAIService:
 
     def extract_review_pros_and_cons(self, review_content):
         completion = self.client.chat.completions.create(
-            model="gpt-3.5-turbo-1106",
+            model="gpt-4o-mini",
             response_format={"type": "json_object"},
             messages=[
                 {
@@ -50,7 +50,7 @@ class OpenAIService:
         """
 
         completion = self.client.chat.completions.create(
-            model="gpt-3.5-turbo-1106",
+            model="gpt-4o-mini",
             response_format={"type": "json_object"},
             messages=[
                 {
@@ -88,7 +88,7 @@ class OpenAIService:
 
     def health_check(self):
         completion = self.client.chat.completions.create(
-            model="gpt-3.5-turbo-1106",
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": "Say this is a test!"}],
         )
         return completion.choices[0].message.content
