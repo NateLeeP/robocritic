@@ -1,4 +1,11 @@
 import os
+from .db_connection import connection
+
+
+class RobocriticDbWriter:
+    def __init__(self):
+        self.connection = connection
+
 
 def insert_game(title, release_date, art_url="https://shorturl.at/RKbAj"):
     try:

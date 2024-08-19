@@ -1,4 +1,5 @@
 from .db_connection import connection
+import os
 import mysql.connector.errors as mysql_errors
 class RobocriticDBReader:
     def __init__(self):
