@@ -39,12 +39,15 @@ class IGDBService:
             logger.error(e)
             logger.error(f"IGDB API Request failed with data: {request_data}")
             raise requests.exceptions.HTTPError(f"IGDB API Request failed")
-        if not response.json():
-            # Will raise an error for empty response
-            raise ValueError(f"No game found from IGDB API with title '{title}'")
         games = response.json()
-        games_with_release_date = [game for game in games if "first_release_date" in game]
-        sorted_games = sorted(games_with_release_date, key=lambda x: x["id"], reverse=True)
+        games_with_release_date = [
+            game for game in games if "first_release_date" in game
+        ]
+        if not games_with_release_date:
+            raise ValueError(f"No game with release date found for title '{title}'")
+        sorted_games = sorted(
+            games_with_release_date, key=lambda x: x["id"], reverse=True
+        )
         game = sorted_games[0]
         try:
             release_date_unix = game["first_release_date"]

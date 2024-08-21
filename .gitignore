@@ -15,3 +15,5 @@ etl/__pycache__/*
 .vscode
 /etl/pc_gamer_etl/config.py
 etl/helper_functions/__pycache__/*
+etl/.pytest_cache/
+etl/tests/__pycache__/
