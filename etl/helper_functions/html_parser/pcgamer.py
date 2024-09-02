@@ -85,5 +85,10 @@ class PCGamerGameReviewParser(HTMLParser):
             return bio_url
         except Exception as e:
             return None
+    
+    def get_critic_score(self):
+        critic_score_tag = self.soup.find('div', class_="score-area").span
+        critic_score = critic_score_tag.get_text() if critic_score_tag else None
+        return int(critic_score) if critic_score else None
 
 

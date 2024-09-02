@@ -16,6 +16,7 @@ class IGDBService:
             "Authorization": f"Bearer {os.environ['IGDB_BEARER_TOKEN']}",
             "Client-ID": os.environ["IGDB_CLIENT_ID"],
         }
+        self.reviewable_platforms = set(['PlayStation 5', 'PlayStation 4', 'Xbox Series X|S', 'Xbox One', 'Nintendo Switch', 'PC (Microsoft Windows)'])
 
     def get_first_release_date_by_title(self, title):
         """
@@ -27,7 +28,7 @@ class IGDBService:
         """
         try:
             request_data = (
-                f'search "{title}"; fields name, genres, platforms, first_release_date;'
+                f'search "{title}"; fields name, platforms.name, first_release_date;'
             )
             response = requests.post(
                 f"{self.base_url}/games",
@@ -49,10 +50,11 @@ class IGDBService:
             games_with_release_date, key=lambda x: x["id"], reverse=True
         )
         game = sorted_games[0]
-        try:
-            release_date_unix = game["first_release_date"]
-            release_date = datetime.utcfromtimestamp(release_date_unix).date()
-            return release_date
-        except KeyError as e:
-            logger.error(e)
-            raise ValueError(f"No release date found with title '{title}'")
+        release_date_unix = game.get("first_release_date")
+        platforms = [platform.get('name') for platform in game.get('platforms', [])]
+        platforms = [platform for platform in platforms if platform in self.reviewable_platforms]
+        if not release_date_unix or not platforms:
+            raise ValueError(f"No release date and /or platforms found for title '{title}'")
+        release_date = datetime.fromtimestamp(release_date_unix).date()
+
+        return release_date, platforms

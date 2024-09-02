@@ -80,12 +80,12 @@ class RobocriticDBReader:
         result = self._execute_query(query, (game_name,))
         return result[0] if result else {}
 
-    def get_review_by_id_and_game(self, publisher_id: int, game_id: int) -> Dict[str, Any]:
+    def get_review_by_publisher_id_and_game(self, publisher_id: int, game_id: int) -> Dict[str, Any]:
         query = "SELECT * FROM review WHERE publisher_id = %s AND game_id = %s"
         result = self._execute_query(query, (publisher_id, game_id))
         return result[0] if result else {}
 
     def get_reviewer_by_name_and_publisher(self, reviewer_full_name: str, publisher_id: int) -> Dict[str, Any]:
-        query = "SELECT * FROM reviewer WHERE full_name = %s AND publisher_id = %s"
+        query = "SELECT * FROM reviewer WHERE reviewer_full_name = %s AND publisher_id = %s"
         result = self._execute_query(query, (reviewer_full_name, publisher_id))
         return result[0] if result else {}
