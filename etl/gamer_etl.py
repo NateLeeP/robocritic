@@ -6,7 +6,13 @@ from helper_functions.igdb_service import IGDBService
 from helper_functions.openai_service import OpenAIService
 from helper_functions.db_connection import connection
 from helper_functions.robo_db_writer import RoboCriticDBWriter
+from helper_functions.giant_bomb_api import GiantBombAPI
 import json
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 def fetch_html(url):
     response = requests.get(url)
     return response.content
@@ -53,8 +59,19 @@ def main():
         game_id = game.get('id')
         
         if not game:
-            release_date, platforms = igdb_service.get_first_release_date_by_title(game_title)
-            art_url = 'placeholder_value'
+            try:
+                release_date, platforms = igdb_service.get_first_release_date_by_title(game_title)
+            except (ValueError, requests.exceptions.HTTPError) as e:
+                logger.error(f'Error getting game {game_title} from IGDB: {e}')
+                continue
+            try:
+                art_url = GiantBombAPI().get_game_artwork(game_title) if not None else 'placeholder_value'
+            except Exception as e:
+                logger.error(f'Error getting game artwork for {game_title} from Giant Bomb: {e}')
+                logger.info(f'Using placeholder value for game artwork')
+                art_url = 'placeholder_value'
+            
+            
             game_id = db_writer.write_game(game_title, release_date, art_url)
             
             for platform in platforms:

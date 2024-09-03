@@ -45,7 +45,7 @@ class IGDBService:
             game for game in games if "first_release_date" in game
         ]
         if not games_with_release_date:
-            raise ValueError(f"No game with release date found for title '{title}'")
+            raise ValueError(f"No game found for title '{title}'")
         sorted_games = sorted(
             games_with_release_date, key=lambda x: x["id"], reverse=True
         )
