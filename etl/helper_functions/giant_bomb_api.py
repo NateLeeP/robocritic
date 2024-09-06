@@ -1,6 +1,10 @@
 import os
 import requests
 from dotenv import load_dotenv
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 class GiantBombAPI:
     def __init__(self):
@@ -31,6 +35,6 @@ class GiantBombAPI:
             return None
 
         except requests.exceptions.HTTPError  as e:
-            raise Exception(f"Request failed due to API error: {str(e)}")
-        except (KeyError, ValueError) as e:
-            raise Exception(f"Error parsing API response: {str(e)}")
+            logger.error(f"Giant Bomb API Request failed due to API error: {str(e)}")
+        except (KeyError, TypeError) as e:
+            logger.error(f"Giant Bomb API Error parsing API response: {str(e)}")

@@ -1,6 +1,10 @@
 import mysql.connector
 from mysql.connector import Error
 from typing import List, Dict, Any
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 class RobocriticDBReader:
     def __init__(self, connection: mysql.connector.connection.MySQLConnection):
@@ -36,10 +40,9 @@ class RobocriticDBReader:
             result = cursor.fetchall()
             cursor.close()
             return result
-        except Error as e:
-            print(f"Error executing query: {e}")
-            return []
-
+        except mysql.connector.Error as e:
+            logger.error(f"Error executing query: {query} for error {e} in db_reader.py")
+            logger.error(f"Error type: {type(e).__name__}")
     def get_game(self, game_id: int) -> Dict[str, Any]:
         query = "SELECT * FROM game WHERE id = %s"
         result = self._execute_query(query, (game_id,))

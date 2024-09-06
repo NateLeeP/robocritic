@@ -7,6 +7,7 @@ from helper_functions.openai_service import OpenAIService
 from helper_functions.db_connection import connection
 from helper_functions.robo_db_writer import RoboCriticDBWriter
 from helper_functions.giant_bomb_api import GiantBombAPI
+from helper_functions.html_parser.factory_functions import get_review_urls, get_parser
 import json
 import logging
 
@@ -41,9 +42,11 @@ platform_id_map = {
 publisher_id = 1
 
 def main():
-    pc_gamer_url = 'https://www.pcgamer.com/reviews/'
-    html_content = fetch_html(pc_gamer_url)
-    review_urls = extract_review_urls(html_content)
+    review_urls = get_review_urls('pcgamer')
+
+    if not connection:
+        logger.error('Error connecting to database, exiting program')
+        return
     
     db_reader = RobocriticDBReader(connection)
     db_writer = RoboCriticDBWriter(connection)
@@ -54,10 +57,14 @@ def main():
         review_html = fetch_html(review_url)
         review_text, game_title, critic_score = extract_review_details(review_html)
         reviewer_name, reviewer_bio_url = extract_reviewer_details(review_html)
+
+
+        if not review_text or not game_title or not critic_score:
+            logger.info(f"Skipping review {review_url} as it is missing required fields")
+            continue
         
         game = db_reader.get_game_by_title(game_title)
         game_id = game.get('id')
-        
         if not game:
             try:
                 release_date, platforms = igdb_service.get_first_release_date_by_title(game_title)
@@ -65,25 +72,25 @@ def main():
                 logger.error(f'Error getting game {game_title} from IGDB: {e}')
                 continue
             try:
-                art_url = GiantBombAPI().get_game_artwork(game_title) if not None else 'placeholder_value'
+                art_url = GiantBombAPI().get_game_artwork(game_title) or 'placeholder_value'
             except Exception as e:
                 logger.error(f'Error getting game artwork for {game_title} from Giant Bomb: {e}')
                 logger.info(f'Using placeholder value for game artwork')
                 art_url = 'placeholder_value'
             
-            
-            game_id = db_writer.write_game(game_title, release_date, art_url)
-            
-            for platform in platforms:
-                platform_id = platform_id_map[platform]
-                db_writer.write_platform_game(platform_id, game_id)
+            try:
+                game_id = db_writer.write_game(game_title, release_date, art_url)
+                for platform in platforms:
+                    platform_id = platform_id_map[platform]
+                    db_writer.write_platform_game(platform_id, game_id)
         
-        try:
-            connection.commit()
-        except mysql.connector.errors.IntegrityError:
-            connection.rollback()
-            print(f'Error committing game {game_title} to database')
-            continue
+                connection.commit()
+            except mysql.connector.Error as e:
+                connection.rollback()
+                logger.error(f'Error committing game {game_title} to database: {e}')
+                logger.error(f'Error type: {type(e).__name__}')
+                logger.info(f"Rolling back transaction, continuing with next review")
+                continue
         
         review = db_reader.get_review_by_publisher_id_and_game(publisher_id, game_id)
 
@@ -93,23 +100,24 @@ def main():
                 reviewer_id = db_writer.write_reviewer(reviewer_name, publisher_id, reviewer_bio_url)
             
             robo_score = openai_service.assign_score_to_content(review_text)
-            robo_score = robo_score['score']
-            review_id = db_writer.write_review(review_url, robo_score, critic_score, reviewer_id, game_id, publisher_id)
-            
             pros_cons = openai_service.extract_review_pros_and_cons(review_text)
 
             pros = json.dumps(pros_cons['pros'])
             cons = json.dumps(pros_cons['cons'])
-
-            db_writer.write_review_pro(review_id, pros)
-            db_writer.write_review_con(review_id, cons)
+            robo_score = robo_score.get('score')
+            
+            try:
+                review_id = db_writer.write_review(review_url, robo_score, critic_score, reviewer_id, game_id, publisher_id)
+                db_writer.write_review_pro(review_id, pros)
+                db_writer.write_review_con(review_id, cons)
         
-        try:
-            connection.commit()
-        except mysql.connector.errors.IntegrityError:
-            connection.rollback()
-            print(f'Error committing review {review_url} to database')
-            continue
+                connection.commit()
+            except mysql.connector.Error as e:
+                connection.rollback()
+                logger.error(f'Error committing review {review_url} to database: {e}')
+                logger.error(f'Error type: {type(e).__name__}')
+                logger.info(f"Rolling back transaction, continuing with next review")
+                continue
 
 if __name__ == '__main__':
     main()
