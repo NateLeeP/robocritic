@@ -1,8 +1,11 @@
 
 from .pcgamer import PCGamerGameReviewParser
 from .ign import IGNGameReviewParser
+from .gamespot import GameSpotReviewParser
+from .base import AbstractHTMLParser
 import requests
 from bs4 import BeautifulSoup
+import re
 # Import other parsers as needed    
 
 header_mapping = {"User-Agent": "Mac Firefox"}
@@ -48,14 +51,32 @@ def get_ign_review_urls(soup):
 
     return video_game_reviews
 
+def get_gamespot_review_urls(soup):
+    """Expected HTML content from Gamespot reviews page
+        https://www.gamespot.com/games/reviews/
+    """
+    a_tags = soup.find_all('a')
+
+    pattern = r'^/reviews/[a-z0-9\-]+-review-[a-z0-9\-]+/\d{4}-\d{7}/$'
+
+    def filter_game_reviews(a):
+        url = a.get('href')
+        return re.match(pattern, url) if url else False
+
+    mapped_tags = map(lambda x: "https://www.gamespot.com" + x.get('href'), filter(filter_game_reviews, a_tags))
+    tags_list = list(mapped_tags)
+    return tags_list
+
 publisher_url_map = {
     'pcgamer': 'https://www.pcgamer.com/reviews/',
-    "ign": "https://www.ign.com/reviews/games"
+    "ign": "https://www.ign.com/reviews/games",
+    "gamespot": "https://www.gamespot.com/games/reviews/"
 }
 
 publisher_parser_function_map = {
     'pcgamer': get_pcgamer_review_urls,
-    'ign': get_ign_review_urls
+    'ign': get_ign_review_urls,
+    "gamespot": get_gamespot_review_urls
 }
 
 
@@ -73,10 +94,11 @@ def get_review_urls(publisher: str):
         raise ValueError(f"Unsupported publisher: {publisher}")
 
 
-def get_parser(source, html_content):
+def get_parser(source: str, html_content: str) -> AbstractHTMLParser:
     parser_map = {
         'pcgamer': PCGamerGameReviewParser,
-        'ign': IGNGameReviewParser
+        'ign': IGNGameReviewParser,
+        'gamespot': GameSpotReviewParser
         # Add other sources and their corresponding parser classes here
     }
 
