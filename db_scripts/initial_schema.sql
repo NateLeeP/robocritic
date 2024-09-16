@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS game (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
     release_date DATE NOT NULL,
-    art_url VARCHAR(100) NOT NULL,
+    art_url VARCHAR(200) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -41,7 +41,7 @@ create table IF NOT EXISTS reviewer (
 
 create table IF NOT EXISTS review (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    review_url VARCHAR(100) NOT NULL,
+    review_url VARCHAR(200) NOT NULL,
     robo_score DECIMAL(3, 1) NOT NULL,
     critic_score DECIMAL(3, 1) NOT NULL,
     reviewer_id INT NOT NULL,
