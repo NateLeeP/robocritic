@@ -23,5 +23,5 @@ def create_connection(host_name, user_name, user_password, database_name):
 
 
 connection = create_connection(
-    "localhost", os.getenv("MYSQL_USER"), os.getenv("MYSQL_PASSWORD"), "robocritic"
+    os.getenv('MYSQL_HOST'), os.getenv("MYSQL_USER"), os.getenv("MYSQL_PASSWORD"), os.getenv("MYSQL_DATABASE")
 )
