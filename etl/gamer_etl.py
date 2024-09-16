@@ -1,6 +1,5 @@
 import requests
 import mysql.connector
-from helper_functions.html_parser.pcgamer import PCGamerReviewsParser, PCGamerGameReviewParser
 from helper_functions.db_reader import RobocriticDBReader
 from helper_functions.igdb_service import IGDBService
 from helper_functions.openai_service import OpenAIService
@@ -10,24 +9,25 @@ from helper_functions.giant_bomb_api import GiantBombAPI
 from helper_functions.html_parser.factory_functions import get_review_urls, get_parser
 import json
 import logging
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+publisher = os.getenv('PUBLISHER')
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def fetch_html(url):
-    response = requests.get(url)
+    response = requests.get(url, headers={"User-Agent": "Mac Firefox"})
     return response.content
 
-def extract_review_urls(html_content):
-    parser = PCGamerReviewsParser(html_content)
-    return parser.get_video_game_review_urls()
-
 def extract_review_details(html_content):
-    parser = PCGamerGameReviewParser(html_content)
+    parser = get_parser(publisher, html_content)
     return parser.get_review_text(), parser.get_game_title(), parser.get_critic_score()
 
 def extract_reviewer_details(html_content):
-    parser = PCGamerGameReviewParser(html_content)
+    parser = get_parser(publisher, html_content)
     return parser.get_reviewer_name(), parser.get_reviewer_bio_url()
 
 platform_id_map = {
@@ -39,10 +39,15 @@ platform_id_map = {
     'PC (Microsoft Windows)': 6
 }
 
-publisher_id = 1
+publisher_id_map = {
+    "pcgamer": 1,
+    "ign": 2,
+    "gamespot": 3
+}
 
 def main():
-    review_urls = get_review_urls('pcgamer')
+    review_urls = get_review_urls(publisher)
+    publisher_id = publisher_id_map[publisher]
 
     if not connection:
         logger.error('Error connecting to database, exiting program')
@@ -95,7 +100,8 @@ def main():
         review = db_reader.get_review_by_publisher_id_and_game(publisher_id, game_id)
 
         if not review:
-            reviewer_id = db_reader.get_reviewer_by_name_and_publisher(reviewer_name, publisher_id)
+            reviewer = db_reader.get_reviewer_by_name_and_publisher(reviewer_name, publisher_id)
+            reviewer_id = reviewer.get('id') if reviewer else None
             if not reviewer_id:
                 reviewer_id = db_writer.write_reviewer(reviewer_name, publisher_id, reviewer_bio_url)
             
