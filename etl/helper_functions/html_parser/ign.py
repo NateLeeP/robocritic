@@ -40,7 +40,7 @@ class IGNGameReviewParser(AbstractHTMLParser):
     def get_reviewer_bio_url(self):
         try:
             author_tag = self.soup.find('a', class_=['article-author'])            
-            bio_url = author_tag['href'] if author_tag else None
+            bio_url = "https://www.ign.com" + author_tag['href'] if author_tag else None
             return bio_url
         except AttributeError as e:
             logger.error(f"AttributeError {e} in IGN soup traversal for reviewer bio URL")
