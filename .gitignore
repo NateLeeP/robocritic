@@ -18,3 +18,4 @@ etl/helper_functions/__pycache__/*
 etl/.pytest_cache/
 etl/tests/__pycache__/
 etl/helper_functions/html_parser/__pycache__/*
+venv/*
