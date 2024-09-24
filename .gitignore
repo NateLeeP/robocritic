@@ -20,4 +20,5 @@ etl/tests/__pycache__/
 etl/helper_functions/html_parser/__pycache__/*
 venv/*
 app/app/__pycache__/*
-app/app/robocritic/__pycache__/*
+app/robocritic/migrations/__pycache__/*
+app/robocritic/__pycache__/*
