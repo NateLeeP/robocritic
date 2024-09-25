@@ -1,0 +1,19 @@
+{% extends 'robocritic/base.html' %}
+
+{% block content %}
+    <div class="container mx-auto p-6">
+        <h2 class="text-2xl font-bold mb-4">Reviews</h2>
+        <div class="space-y-4">
+            {% for review in reviews %}
+                <div class="bg-slate-700 p-4 rounded-lg shadow">
+                    <p><strong>Review URL:</strong> <a href="{{ review.review_url }}" class="text-blue-400 hover:text-blue-300">{{ review.review_url }}</a></p>
+                    <p><strong>Publisher ID:</strong> {{ review.publisher_id }}</p>
+                    <p><strong>Critic Score:</strong> {{ review.critic_score }}</p>
+                    <p><strong>Robo Score:</strong> {{ review.robo_score }}</p>
+                </div>
+            {% empty %}
+                <p>No reviews available.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
