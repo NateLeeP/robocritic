@@ -1,26 +1,17 @@
-{% load static %}
+{% extends 'robocritic/base.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RoboCritic</title>
-</head>
+{% block content %}
 
-<body>
-    <header>
-        <h1>Welcome to RoboCritic</h1>
-        <img src="{% static 'robocritic/images/robot_logo.png' %}" alt="RoboCritic Logo">
-    </header>
-    <main>
-        <section>
-            <h2>Latest Reviews</h2>
-            <!-- Reviews will be dynamically loaded here -->
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2024 RoboCritic. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+    <div class="container mx-auto p-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {% for game in games %}
+            <div class="flex flex-col items-center">
+                <img src="{{ game.art_url }}" alt="{{ game.title }}" class="w-full rounded-lg shadow-lg">
+                <h3 class="mt-3 font-bold text-lg">{{ game.title }}</h3>
+                <p class="text-sm text-gray-400">Release Date: {{ game.release_date }}</p>
+                <a href="{{ game.review_link }}" class="text-sm text-blue-400 hover:text-blue-300">Read Reviews</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
