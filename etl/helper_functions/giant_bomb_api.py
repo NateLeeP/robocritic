@@ -17,7 +17,9 @@ class GiantBombAPI:
             'api_key': self.api_key,
             'format': 'json',
             'filter': f'name:{game_title}',
-            'field_list': 'name,image'
+            'field_list': 'name,image',
+            'limit': 1,
+            'sort': 'original_release_date:desc'
         }
 
         try:
@@ -28,11 +30,8 @@ class GiantBombAPI:
             if data['error'] != 'OK':
                 raise requests.exceptions.HTTPError(f"API Error: {data['error']}")
 
-            for game in data['results']:
-                if game['name'].lower() == game_title.lower():
-                    return game['image']['original_url']
-
-            return None
+            most_recent_game = data['results'][0] 
+            return most_recent_game['image']['original_url']
 
         except requests.exceptions.HTTPError  as e:
             logger.error(f"Giant Bomb API Request failed due to API error: {str(e)}")
