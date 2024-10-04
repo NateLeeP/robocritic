@@ -6,12 +6,36 @@
     <img class="w-25 h-25" src="{{ game.art_url }}" alt="{{ game.title }}">
     <div class="space-y-4">
         {% for review in reviews %}
+
         <div class="bg-slate-700 p-4 rounded-lg shadow">
             <p><strong>Publisher:</strong> <a href="{{ review.review_url }}"
                     class="text-blue-400 hover:text-blue-300">{{ review.publisher }}
                 </a></p>
             <p><strong>Critic Score:</strong> {{ review.critic_score }}</p>
             <p><strong>Robo Score:</strong> {{ review.robo_score }}</p>
+            <div class="mt-4 flex flex-wrap">
+                {% if review.reviewpro_set.all %}
+                <div class="mt-4">
+                    <h3 class="font-semibold">Pros:</h3>
+                    <ul class="list-disc list-inside">
+                        {% for pro in review.reviewpro_set.first.pros %}
+                        <li>{{ pro }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if review.reviewcon_set.all %}
+                <div class="w-full md:w-1/2 pl-2">
+                    <h3 class="font-semibold">Cons:</h3>
+                    <ul class="list-disc list-inside">
+                        {% for con in review.reviewcon_set.first.cons %}
+                        <li>{{ con }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
         </div>
         {% empty %}
         <p>No reviews available.</p>

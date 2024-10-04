@@ -91,7 +91,7 @@ class ReviewPro(models.Model):
     # Primary keys automatic - adding for readability
     id = models.BigAutoField(primary_key=True)
     review = models.ForeignKey(Review, on_delete=models.DO_NOTHING)
-    pros = models.TextField()
+    pros = models.JSONField(default=list, null=True)
 
     class Meta:
         managed = False
@@ -101,7 +101,7 @@ class ReviewCon(models.Model):
     # Primary keys automatic - adding for readability
     id = models.BigAutoField(primary_key=True)
     review = models.ForeignKey(Review, on_delete=models.DO_NOTHING)
-    cons = models.TextField()
+    cons = models.JSONField(default=list, null=True)
 
     class Meta:
         managed = False
