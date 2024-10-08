@@ -23,9 +23,10 @@ class GameSpotReviewParser(AbstractHTMLParser):
     def get_game_title(self):
         try:
             review_title = self.soup.find('h1', class_='kubrick-info__title').get_text(strip=True)
-            index = review_title.find('Review')
+            # Find the index of 'remake' or 'review', whichever comes first (case-insensitive)
+            index = next((i for i, word in enumerate(review_title.lower().split()) if word in ['remake', 'review']), -1)
             if index != -1:
-                return review_title[:index].strip()
+                return ' '.join(review_title.split()[:index]).strip()
             return review_title if review_title else None
         except AttributeError as e:
             logger.error(f"AttributeError {e} in soup traversal for Gamespot game title")
