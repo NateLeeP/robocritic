@@ -27,8 +27,8 @@ class IGNGameReviewParser(AbstractHTMLParser):
 
     def get_reviewer_name(self):
         try:
-            author_tag = self.soup.find('a', class_=['article-author'])
-            author_name = author_tag.get_text() if author_tag else None
+            author_tag = self.soup.find('meta', property="article:author")
+            author_name = author_tag['content'] if author_tag else None
             return author_name
         except AttributeError as e:
             logger.error(f"AttributeError {e} in IGN soup traversal for reviewer name")
@@ -38,16 +38,8 @@ class IGNGameReviewParser(AbstractHTMLParser):
             return None
 
     def get_reviewer_bio_url(self):
-        try:
-            author_tag = self.soup.find('a', class_=['article-author'])            
-            bio_url = "https://www.ign.com" + author_tag['href'] if author_tag else None
-            return bio_url
-        except AttributeError as e:
-            logger.error(f"AttributeError {e} in IGN soup traversal for reviewer bio URL")
-            return None
-        except Exception as e:
-            logger.error(f"Error getting IGN reviewer bio URL: {e}")
-            return None
+        # Scraping IGN reviewer bio URL is failing. 
+        return None
 
     def get_critic_score(self):
         try:

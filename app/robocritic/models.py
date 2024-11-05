@@ -58,7 +58,7 @@ class Publisher(models.Model):
 class Reviewer(models.Model):
     # Primary keys automatic - adding for readability
     id = models.BigAutoField(primary_key=True)
-    reviewer_full_name = models.CharField(max_length=100)
+    reviewer_full_name = models.CharField(max_length=100, blank=True, null=True)
     publisher = models.ForeignKey(Publisher, on_delete=models.DO_NOTHING)
     reviewer_bio_url = models.CharField(max_length=100, blank=True, null=True)
 
