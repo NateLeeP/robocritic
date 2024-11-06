@@ -57,7 +57,7 @@ def get_gamespot_review_urls(soup):
     """
     a_tags = soup.find_all('a')
 
-    pattern = r'^/reviews/[a-z0-9\-]+-review-[a-z0-9\-]+/\d{4}-\d{7}/$'
+    pattern = r'^/reviews/[a-z0-9\-]+-review[a-z0-9\-]*/\d{4}-\d{7}/$'
 
     def filter_game_reviews(a):
         url = a.get('href')
