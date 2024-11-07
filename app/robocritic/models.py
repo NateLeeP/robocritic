@@ -1,20 +1,19 @@
 from django.db import models
 
-# Create your models here.
-
 class Game(models.Model):
     # Primary keys automatic - adding for readability
     id = models.BigAutoField(primary_key=True)
     title = models.CharField(max_length=100)
     release_date = models.DateField()
     art_url = models.CharField(max_length=200)
+    youtube_gameplay_url = models.CharField(max_length=200, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
 
     class Meta:
-        managed = False
+        managed=False
         db_table = 'game'
         ordering = ['-release_date']
 
