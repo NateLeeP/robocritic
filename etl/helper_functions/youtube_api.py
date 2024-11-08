@@ -18,6 +18,7 @@ class YoutubeApi:
                                     'type': 'video',
                                     'maxResults': 1
                                 })
+        print(response.text)
         response.raise_for_status()
         videos = response.json()['items']
         if not videos:
