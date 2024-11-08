@@ -6,6 +6,7 @@ from helper_functions.openai_service import OpenAIService
 from helper_functions.db_connection import connection
 from helper_functions.robo_db_writer import RoboCriticDBWriter
 from helper_functions.giant_bomb_api import GiantBombAPI
+from helper_functions.youtube_api import YoutubeApi
 from helper_functions.html_parser.factory_functions import get_review_urls, get_parser
 import json
 import logging
@@ -84,7 +85,7 @@ def main():
                 art_url = 'placeholder_value'
             
             try:
-                game_id = db_writer.write_game(game_title, release_date, art_url)
+                game_id = db_writer.write_game(game_title, release_date, art_url, youtube_gameplay_url)
                 for platform in platforms:
                     platform_id = platform_id_map[platform]
                     db_writer.write_platform_game(platform_id, game_id)
@@ -93,6 +94,20 @@ def main():
             except mysql.connector.Error as e:
                 connection.rollback()
                 logger.error(f'Error committing game {game_title} to database: {e}')
+                logger.error(f'Error type: {type(e).__name__}')
+                logger.info(f"Rolling back transaction, continuing with next review")
+                continue
+        try:
+            youtube_gameplay_url = YoutubeApi().search_for_gameplay_videos(game_title)
+        except requests.exceptions.HTTPError as e:
+            logger.error(f'Error getting youtube gameplay url for {game_title}: {e}')
+            youtube_gameplay_url = None
+        if game_id and youtube_gameplay_url:
+            try:
+                db_writer.update_game(game_id, youtube_gameplay_url=youtube_gameplay_url)
+            except mysql.connector.Error as e:
+                connection.rollback()
+                logger.error(f'Error UPDATING game {game_title} in database: {e}')
                 logger.error(f'Error type: {type(e).__name__}')
                 logger.info(f"Rolling back transaction, continuing with next review")
                 continue

@@ -6,13 +6,13 @@ class RoboCriticDBWriter:
     def __init__(self, connection: mysql.connector.connection.MySQLConnection) -> None:
         self.connection = connection
 
-    def write_game(self, title: str, release_date: date, art_url: str) -> None:
+    def write_game(self, title: str, release_date: date, art_url: str, youtube_gameplay_url: str) -> None:
         cursor = self.connection.cursor()
         query = """
-        INSERT INTO game (title, release_date, art_url)
-        VALUES (%s, %s, %s)
+        INSERT INTO game (title, release_date, art_url, youtube_gameplay_url)
+        VALUES (%s, %s, %s, %s)
         """
-        cursor.execute(query, (title, release_date, art_url))
+        cursor.execute(query, (title, release_date, art_url, youtube_gameplay_url))
         game_id = cursor.lastrowid
         cursor.close()
         return game_id
@@ -71,3 +71,35 @@ class RoboCriticDBWriter:
         review_con_id = cursor.lastrowid
         cursor.close()
         return review_con_id
+    def update_game(self, game_id: int, **fields_to_update) -> bool:
+        """
+        Update one or more fields for a game in the database.
+        
+        Args:
+        game_id (int): The ID of the game to update
+        **fields_to_update:  Possible fields: title, release_date, art_url, youtube_gameplay_url
+    
+        Returns:
+            bool: True if update was successful, False otherwise
+        """
+        if not fields_to_update:
+            return False    
+        
+        cursor = self.connection.cursor()
+    
+        # Build the UPDATE query dynamically based on provided fields
+        set_clause = ", ".join([f"{field} = %s" for field in fields_to_update.keys()])
+        query = f"""
+        UPDATE game 
+        SET {set_clause}
+        WHERE id = %s
+        """
+    
+        # Create tuple of values for the query
+        values = tuple(fields_to_update.values()) + (game_id,)
+        
+        cursor.execute(query, values)
+        self.connection.commit()
+        success = cursor.rowcount > 0
+        cursor.close()
+        return success
