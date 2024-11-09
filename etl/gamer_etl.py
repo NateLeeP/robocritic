@@ -85,7 +85,7 @@ def main():
                 art_url = 'placeholder_value'
             
             try:
-                game_id = db_writer.write_game(game_title, release_date, art_url, youtube_gameplay_url)
+                game_id = db_writer.write_game(game_title, release_date, art_url)
                 for platform in platforms:
                     platform_id = platform_id_map[platform]
                     db_writer.write_platform_game(platform_id, game_id)
