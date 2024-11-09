@@ -57,13 +57,13 @@ def get_gamespot_review_urls(soup):
     """
     a_tags = soup.find_all('a')
 
-    pattern = r'^/reviews/[a-z0-9\-]+-review[a-z0-9\-]*/\d{4}-\d{7}/$'
+    pattern = r'.*/reviews/[a-z0-9\-]+-review[a-z0-9\-]*/\d{4}-\d{7}/$'
 
     def filter_game_reviews(a):
         url = a.get('href')
         return re.match(pattern, url) if url else False
 
-    mapped_tags = map(lambda x: "https://www.gamespot.com" + x.get('href'), filter(filter_game_reviews, a_tags))
+    mapped_tags = map(lambda x: "https://www.gamespot.com" + x.get('href') if x.get('href').startswith('/reviews/') else x.get('href'), filter(filter_game_reviews, a_tags))
     tags_list = list(mapped_tags)
     return tags_list
 
