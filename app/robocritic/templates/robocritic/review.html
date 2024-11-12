@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mx-auto p-6">
-    <h2 class="text-2xl font-bold mb-4">{{ game.title }}</h2>
+    <h2 class="text-2xl font-bold mb-4 text-gray-950">{{ game.title }}</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 mb-8">
         <!-- Image section -->
         <div>
@@ -24,10 +24,10 @@
             </iframe>
         </div>
     </div>
-    <div class="space-y-4">
+    <div class="space-y-4 text-gray-950">
         {% for review in reviews %}
 
-        <div class="bg-slate-700 p-4 rounded-lg shadow">
+        <div class="p-4 rounded-lg border-4 border-solid">
             <p><strong>Publisher:</strong> <a href="{{ review.review_url }}"
                     class="text-blue-400 hover:text-blue-300">{{ review.publisher }}
                 </a></p>
