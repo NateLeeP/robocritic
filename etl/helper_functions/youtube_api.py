@@ -17,7 +17,12 @@ class YoutubeApi:
                                     'type': 'video',
                                     'maxResults': 1
                                 })
-        response.raise_for_status()
+        if response.status_code != 200:
+            error_message = response.json()['error']['message']
+            raise requests.exceptions.HTTPError(
+                f'''Error getting youtube gameplay url for {game_title}: 
+                {response.status_code}. Response: {error_message}'''
+            )
         videos = response.json()['items']
         if not videos:
             return None

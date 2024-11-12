@@ -100,7 +100,7 @@ def main():
         try:
             youtube_gameplay_url = YoutubeApi().search_for_gameplay_videos(game_title)
         except requests.exceptions.HTTPError as e:
-            logger.error(f'Error getting youtube gameplay url for {game_title}: {e}')
+            logger.error(f'{e}')
             youtube_gameplay_url = None
         if game_id and youtube_gameplay_url:
             try:
