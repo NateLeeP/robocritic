@@ -24,19 +24,47 @@
             </iframe>
         </div>
     </div>
-    <div class="space-y-4 text-gray-950">
-        {% for review in reviews %}
+    <div class="container mx-auto">
+        <!-- Review cards grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 text-gray-950 mb-4">
+            {% for review in reviews %}
+            <div class="p-2 rounded-lg border border-solid">
+                <div class="flex flex-col space-y-2">
+                    <!-- Publisher section -->
+                    <div>
+                        <span class="font-semibold">Publisher</span>
+                        <a href="{{ review.url }}" 
+                           onclick="toggleReview('review-{{ review.id }}'); return false;"
+                           class="text-blue-400 hover:text-blue-300">
+                            {{ review.publisher }}
+                        </a>
+                    </div>
 
-        <div class="p-4 rounded-lg border-4 border-solid">
-            <p><strong>Publisher:</strong> <a href="{{ review.review_url }}"
-                    class="text-blue-400 hover:text-blue-300">{{ review.publisher }}
-                </a></p>
-            <p><strong>Critic Score:</strong> {{ review.critic_score }}</p>
-            <p><strong>Robo Score:</strong> {{ review.robo_score }}</p>
-            <div class="mt-4 flex flex-wrap">
+                    <!-- Critic Score section -->
+                    <div>
+                        <span class="font-semibold">Critic Score</span>
+                        <span>{{ review.critic_score }}</span>
+                    </div>
+
+                    <!-- Robo Score section -->
+                    <div>
+                        <span class="font-semibold">Robo Score</span>
+                        <span>{{ review.robo_score }}</span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No reviews available.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Single pros/cons container outside the grid -->
+        {% for review in reviews %}
+        <div id="review-{{ review.id }}" class="hidden w-full p-4 border-4 border-solid rounded-lg text-gray-950">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {% if review.reviewpro_set.all %}
-                <div class="mt-4">
-                    <h3 class="font-semibold">Pros:</h3>
+                <div>
+                    <h3 class="font-semibold text-xl mb-2">Pros:</h3>
                     <ul class="list-disc list-inside">
                         {% for pro in review.reviewpro_set.first.pros %}
                         <li>{{ pro }}</li>
@@ -46,8 +74,8 @@
                 {% endif %}
 
                 {% if review.reviewcon_set.all %}
-                <div class="w-full md:w-1/2 pl-2">
-                    <h3 class="font-semibold">Cons:</h3>
+                <div>
+                    <h3 class="font-semibold text-xl mb-2">Cons:</h3>
                     <ul class="list-disc list-inside">
                         {% for con in review.reviewcon_set.first.cons %}
                         <li>{{ con }}</li>
@@ -57,9 +85,20 @@
                 {% endif %}
             </div>
         </div>
-        {% empty %}
-        <p>No reviews available.</p>
         {% endfor %}
     </div>
+
+    <script>
+        function toggleReview(reviewId) {
+            // Hide all review details first
+            document.querySelectorAll('[id^="review-"]').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // Show the selected review
+            const review = document.getElementById(reviewId);
+            review.classList.remove('hidden');
+        }
+    </script>
 </div>
 {% endblock %}
