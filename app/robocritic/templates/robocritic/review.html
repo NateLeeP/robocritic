@@ -3,107 +3,108 @@
 {% block content %}
 <div class="container mx-auto p-6">
     <h2 class="text-2xl font-bold mb-4 text-gray-950">{{ game.title }}</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 mb-8">
-        <!-- Image section -->
-        <div>
-            <img class="w-96 h-96 object-cover rounded-lg shadow-lg" 
-                 src="{{ game.art_url }}" 
-                 alt="{{ game.title }}">
+    
+    <!-- Main grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Left column: Image and Buy section -->
+        <div class="flex flex-col space-y-4">
+            <!-- Image section -->
+                <img class="w-96 h-96 object-cover rounded-lg shadow-lg" 
+                     src="{{ game.art_url }}" 
+                     alt="{{ game.title }}">
         </div>
-        
-        <!-- Video section -->
+
+        <!-- Right column: Review cards section -->
         <div>
-
-            <iframe 
-                class="w-full h-96 rounded-lg shadow-lg"
-                src="{{ game.youtube_gameplay_url }}"
-                title="{{ game.title }} Gameplay"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-            </iframe>
-        </div>
-    </div>
-    <div class="container mx-auto">
-        <!-- Review cards grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-gray-950 mb-4">
-            {% for review in reviews %}
-            <div class="p-4 rounded-lg border-2 {% if forloop.first %}border-blue-400{% else %}border-gray-200{% endif %} hover:border-blue-400 cursor-pointer transition-all duration-200"
-                 onclick="toggleReview('review-{{ review.id }}', this)">
-                <div class="flex flex-col space-y-3">
-                    <!-- Publisher section -->
-                    <div>
-                        <span class="font-semibold">Publisher</span>
-                        <span class="text-blue-600">{{ review.publisher }}</span>
-                    </div>
-
-                    <!-- Critic Score section -->
-                    <div>
-                        <span class="font-semibold">Critic Score</span>
-                        <span>{{ review.critic_score }}</span>
-                    </div>
-
-                    <!-- Robo Score section -->
-                    <div>
-                        <span class="font-semibold">Robo Score</span>
-                        <span>{{ review.robo_score }}</span>
+            <div class="flex gap-4 text-gray-950 mb-4">
+                {% for review in reviews %}
+                <div class="p-4 rounded-lg border-2 {% if forloop.first %}border-blue-400{% else %}border-gray-200{% endif %} hover:border-blue-400 cursor-pointer transition-all duration-200"
+                     onclick="toggleReview('review-{{ review.id }}', this)">
+                    <div class="flex flex-col space-y-3">
+                        <!-- Publisher section -->
+                        <div>
+                            <span class="font-semibold">Publisher:</span>
+                            <a href="{{ review.review_url }}" 
+                               class="text-blue-600 hover:text-blue-400 transition-colors duration-200">
+                                {{ review.publisher }}
+                            </a>
+                        </div>
+                        <!-- Scores sections -->
+                        <div>
+                            <span class="font-semibold">Critic Score:</span>
+                            <span>{{ review.critic_score }}</span>
+                        </div>
+                        <div>
+                            <span class="font-semibold">Robo Score:</span>
+                            <span>{{ review.robo_score }}</span>
+                        </div>
                     </div>
                 </div>
+                {% empty %}
+                <p>No reviews available.</p>
+                {% endfor %}
             </div>
-            {% empty %}
-            <p>No reviews available.</p>
+
+            <!-- Pros/Cons for selected review -->
+            {% for review in reviews %}
+            <div id="review-{{ review.id }}" class="{% if not forloop.first %}hidden{% endif %} w-full p-4 border-4 border-solid rounded-lg text-gray-950">
+                <div>
+                    {% if review.reviewpro_set.all %}
+                    <div>
+                        <h3 class="font-semibold text-xl mb-2">Pros:</h3>
+                        <ul class="list-disc list-inside">
+                            {% for pro in review.reviewpro_set.first.pros %}
+                            <li>{{ pro }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if review.reviewcon_set.all %}
+                    <div>
+                        <h3 class="font-semibold text-xl mb-2">Cons:</h3>
+                        <ul class="list-disc list-inside">
+                            {% for con in review.reviewcon_set.first.cons %}
+                            <li>{{ con }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
             {% endfor %}
         </div>
-
-        <!-- Single pros/cons container outside the grid -->
-        {% for review in reviews %}
-        <div id="review-{{ review.id }}" class="{% if not forloop.first %}hidden{% endif %} w-full p-4 border-4 border-solid rounded-lg text-gray-950">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {% if review.reviewpro_set.all %}
-                <div>
-                    <h3 class="font-semibold text-xl mb-2">Pros:</h3>
-                    <ul class="list-disc list-inside">
-                        {% for pro in review.reviewpro_set.first.pros %}
-                        <li>{{ pro }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-
-                {% if review.reviewcon_set.all %}
-                <div>
-                    <h3 class="font-semibold text-xl mb-2">Cons:</h3>
-                    <ul class="list-disc list-inside">
-                        {% for con in review.reviewcon_set.first.cons %}
-                        <li>{{ con }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
     </div>
 
-    <script>
-        function toggleReview(reviewId, clickedElement) {
-            // Remove active state from all cards
-            document.querySelectorAll('[onclick^="toggleReview"]').forEach(el => {
-                el.classList.remove('border-blue-400');
-                el.classList.add('border-gray-200');
-            });
-            
-            // Hide all review details
-            document.querySelectorAll('[id^="review-"]').forEach(el => {
-                el.classList.add('hidden');
-            });
-            
-            // Show the selected review and highlight the clicked card
-            const review = document.getElementById(reviewId);
-            review.classList.remove('hidden');
-            clickedElement.classList.remove('border-gray-200');
-            clickedElement.classList.add('border-blue-400');
-        }
-    </script>
+    <!-- Bottom section: Video -->
+        <iframe 
+            class="w-96 h-96 rounded-lg shadow-lg"
+            src="{{ game.youtube_gameplay_url }}"
+            title="{{ game.title }} Gameplay"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+        </iframe>
 </div>
+
+<script>
+    function toggleReview(reviewId, clickedElement) {
+        // Remove active state from all cards
+        document.querySelectorAll('[onclick^="toggleReview"]').forEach(el => {
+            el.classList.remove('border-blue-400');
+            el.classList.add('border-gray-200');
+        });
+        
+        // Hide all review details
+        document.querySelectorAll('[id^="review-"]').forEach(el => {
+            el.classList.add('hidden');
+        });
+        
+        // Show the selected review and highlight the clicked card
+        const review = document.getElementById(reviewId);
+        review.classList.remove('hidden');
+        clickedElement.classList.remove('border-gray-200');
+        clickedElement.classList.add('border-blue-400');
+    }
+</script>
 {% endblock %}
