@@ -26,18 +26,15 @@
     </div>
     <div class="container mx-auto">
         <!-- Review cards grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 text-gray-950 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-gray-950 mb-4">
             {% for review in reviews %}
-            <div class="p-2 rounded-lg border border-solid">
-                <div class="flex flex-col space-y-2">
+            <div class="p-4 rounded-lg border-2 {% if forloop.first %}border-blue-400{% else %}border-gray-200{% endif %} hover:border-blue-400 cursor-pointer transition-all duration-200"
+                 onclick="toggleReview('review-{{ review.id }}', this)">
+                <div class="flex flex-col space-y-3">
                     <!-- Publisher section -->
                     <div>
                         <span class="font-semibold">Publisher</span>
-                        <a href="{{ review.url }}" 
-                           onclick="toggleReview('review-{{ review.id }}'); return false;"
-                           class="text-blue-400 hover:text-blue-300">
-                            {{ review.publisher }}
-                        </a>
+                        <span class="text-blue-600">{{ review.publisher }}</span>
                     </div>
 
                     <!-- Critic Score section -->
@@ -60,7 +57,7 @@
 
         <!-- Single pros/cons container outside the grid -->
         {% for review in reviews %}
-        <div id="review-{{ review.id }}" class="hidden w-full p-4 border-4 border-solid rounded-lg text-gray-950">
+        <div id="review-{{ review.id }}" class="{% if not forloop.first %}hidden{% endif %} w-full p-4 border-4 border-solid rounded-lg text-gray-950">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {% if review.reviewpro_set.all %}
                 <div>
@@ -89,15 +86,23 @@
     </div>
 
     <script>
-        function toggleReview(reviewId) {
-            // Hide all review details first
+        function toggleReview(reviewId, clickedElement) {
+            // Remove active state from all cards
+            document.querySelectorAll('[onclick^="toggleReview"]').forEach(el => {
+                el.classList.remove('border-blue-400');
+                el.classList.add('border-gray-200');
+            });
+            
+            // Hide all review details
             document.querySelectorAll('[id^="review-"]').forEach(el => {
                 el.classList.add('hidden');
             });
             
-            // Show the selected review
+            // Show the selected review and highlight the clicked card
             const review = document.getElementById(reviewId);
             review.classList.remove('hidden');
+            clickedElement.classList.remove('border-gray-200');
+            clickedElement.classList.add('border-blue-400');
         }
     </script>
 </div>
