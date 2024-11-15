@@ -25,8 +25,13 @@ class OpenAIService:
                 },
                 {
                     "role": "system",
+                    "content": "Do not output any more than 5 pros and 5 cons",
+                },
+                {
+                    "role": "system",
                     "content": "The list of pros and cons should be generated ONLY from the content passed by the user. Do not use additional resources",
                 },
+        
                 {"role": "user", "content": review_content},
             ],
         )
