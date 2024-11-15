@@ -1,41 +1,46 @@
 {% extends 'robocritic/base.html' %}
 
 {% block content %}
-<div class="container mx-auto p-6">
+<div class="container mx-auto p-6 max-w-7xl">
     <h2 class="text-2xl font-bold mb-4 text-gray-950">{{ game.title }}</h2>
     
     <!-- Main grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Left column: Image and Buy section -->
         <div class="flex flex-col space-y-4">
             <!-- Image section -->
-                <img class="w-96 h-96 object-cover rounded-lg shadow-lg" 
+                <img class="w-full max-w-2xl h-auto aspect-square object-cover rounded-lg shadow-lg" 
                      src="{{ game.art_url }}" 
                      alt="{{ game.title }}">
         </div>
 
         <!-- Right column: Review cards section -->
         <div>
-            <div class="flex gap-4 text-gray-950 mb-4">
+            <div class="gap-4 text-gray-950 mb-4">
+                <!-- Header row -->
+                <div class="px-1 flex">
+                    <span class="font-semibold">Publisher</span>
+                    <div class="flex flex w-full justify-end gap-x-8">
+                        <span class="font-semibold">Critic</span>
+                        <span class="font-semibold">AI</span>
+                    </div>
+                </div>
                 {% for review in reviews %}
-                <div class="p-4 rounded-lg border-2 {% if forloop.first %}border-blue-400{% else %}border-gray-200{% endif %} hover:border-blue-400 cursor-pointer transition-all duration-200"
+                <div class="rounded-lg border-2 {% if forloop.first %}border-blue-400{% else %}border-gray-200{% endif %} hover:border-blue-400 cursor-pointer transition-all duration-200"
                      onclick="toggleReview('review-{{ review.id }}', this)">
-                    <div class="flex flex-col space-y-3">
+                    <div class="flex">
                         <!-- Publisher section -->
-                        <div>
-                            <span class="font-semibold">Publisher:</span>
-                            <a href="{{ review.review_url }}" 
-                               class="text-blue-600 hover:text-blue-400 transition-colors duration-200">
-                                {{ review.publisher }}
-                            </a>
-                        </div>
-                        <!-- Scores sections -->
-                        <div>
-                            <span class="font-semibold">Critic Score:</span>
+                         <div class="w-1/4">
+
+                             <a href="{{ review.review_url }}" 
+                                class="text-blue-600 hover:text-blue-400 transition-colors duration-200">
+                                 {{ review.publisher }}
+                             </a>
+
+                         </div>
+                        <div class="flex w-3/4 justify-end gap-x-8">
+                            <!-- Scores sections -->
                             <span>{{ review.critic_score }}</span>
-                        </div>
-                        <div>
-                            <span class="font-semibold">Robo Score:</span>
                             <span>{{ review.robo_score }}</span>
                         </div>
                     </div>
@@ -78,7 +83,7 @@
 
     <!-- Bottom section: Video -->
         <iframe 
-            class="w-96 h-96 rounded-lg shadow-lg"
+            class="w-full max-w-2xl h-auto aspect-video mt-8 rounded-lg shadow-lg"
             src="{{ game.youtube_gameplay_url }}"
             title="{{ game.title }} Gameplay"
             frameborder="0"
