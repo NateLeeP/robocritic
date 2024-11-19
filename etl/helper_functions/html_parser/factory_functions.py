@@ -2,6 +2,7 @@
 from .pcgamer import PCGamerGameReviewParser
 from .ign import IGNGameReviewParser
 from .gamespot import GameSpotReviewParser
+from .gamerant import GameRantGameReviewParser
 from .base import AbstractHTMLParser
 import requests
 from bs4 import BeautifulSoup
@@ -67,16 +68,32 @@ def get_gamespot_review_urls(soup):
     tags_list = list(mapped_tags)
     return tags_list
 
+def get_gamerant_review_urls(soup):
+    """Expected HTML content from Gamerant reviews page
+        https://gamerant.com/game-reviews/
+    """
+    # TODO: Implement this
+    a_tags = soup.find_all('a')
+    pattern = r'/[a-z0-9\-]+-review/$'
+
+    filtered_a_tags = filter(lambda x: re.match(pattern, x.get('href')), a_tags)
+
+    review_urls = ['https://gamerant.com' + x.get('href') for x in filtered_a_tags]
+    review_urls = set(review_urls)
+    return list(review_urls)
+
 publisher_url_map = {
     'pcgamer': 'https://www.pcgamer.com/reviews/',
     "ign": "https://www.ign.com/reviews/games",
-    "gamespot": "https://www.gamespot.com/games/reviews/"
+    "gamespot": "https://www.gamespot.com/games/reviews/",
+    "gamerant": "https://gamerant.com/game-reviews/"
 }
 
 publisher_parser_function_map = {
     'pcgamer': get_pcgamer_review_urls,
     'ign': get_ign_review_urls,
-    "gamespot": get_gamespot_review_urls
+    "gamespot": get_gamespot_review_urls,
+    "gamerant": get_gamerant_review_urls
 }
 
 
@@ -98,7 +115,8 @@ def get_parser(source: str, html_content: str) -> AbstractHTMLParser:
     parser_map = {
         'pcgamer': PCGamerGameReviewParser,
         'ign': IGNGameReviewParser,
-        'gamespot': GameSpotReviewParser
+        'gamespot': GameSpotReviewParser,
+        "gamerant": GameRantGameReviewParser
         # Add other sources and their corresponding parser classes here
     }
 

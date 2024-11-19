@@ -43,7 +43,8 @@ platform_id_map = {
 publisher_id_map = {
     "pcgamer": 1,
     "ign": 2,
-    "gamespot": 3
+    "gamespot": 3,
+    "gamerant": 4
 }
 
 def main():
