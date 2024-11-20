@@ -16,7 +16,7 @@ class GameRantGameReviewParser(AbstractHTMLParser):
     def get_game_title(self):
         title_tag = self.soup.find('h1', class_='article-header-title')
         if title_tag:
-            return title_tag.text.replace("Review", "").strip()
+            return title_tag.text.split('Review')[0].strip()
         else:
             return None
 
