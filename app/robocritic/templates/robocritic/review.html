@@ -5,43 +5,35 @@
     <h2 class="text-2xl font-bold mb-4 text-gray-950">{{ game.title }}</h2>
     
     <!-- Main grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-3">
         <!-- Left column: Image and Buy section -->
-        <div class="flex flex-col space-y-4">
+        <div class="flex flex-col">
             <!-- Image section -->
-                <img class="w-full max-w-2xl h-full aspect-square rounded-lg shadow-lg" 
+                <img class="w-full max-h-96 aspect-square rounded-lg shadow-lg" 
                      src="{{ game.art_url }}" 
                      alt="{{ game.title }}">
+
         </div>
 
         <!-- Right column: Review cards section -->
-        <div>
-            <div class="gap-4 text-gray-950 mb-4">
+            <div class="px-4 text-gray-950">
                 <!-- Header row -->
-                <div class="px-1 flex">
-                    <span class="font-semibold">Publisher</span>
-                    <div class="flex flex w-full justify-end gap-x-8">
-                        <span class="font-semibold">Critic</span>
-                        <span class="font-semibold">AI</span>
-                    </div>
-                </div>
                 {% for review in reviews %}
                 <div class="rounded-lg border-2 {% if forloop.first %}border-blue-400{% else %}border-gray-200{% endif %} hover:border-blue-400 cursor-pointer transition-all duration-200"
                      onclick="toggleReview('review-{{ review.id }}', this)">
                     <div class="flex">
                         <!-- Publisher section -->
-                         <div class="w-1/4">
+                         <div class="w-1/3">
 
                              <a href="{{ review.review_url }}" 
-                                class="text-blue-600 hover:text-blue-400 transition-colors duration-200">
+                                class="text-lg text-blue-600 hover:text-blue-400 transition-colors duration-200">
                                  {{ review.publisher }}
                              </a>
 
                          </div>
-                        <div class="flex w-3/4 justify-end gap-x-8">
+                        <div class="flex w-2/3 justify-end gap-x-8">
                             <!-- Scores sections -->
-                            <span>{{ review.critic_score }}</span>
-                            <span>{{ review.robo_score }}</span>
+                            <span class="text-lg">{{ review.critic_score }}</span>
                         </div>
                     </div>
                 </div>
@@ -51,45 +43,51 @@
             </div>
 
             <!-- Pros/Cons for selected review -->
-            {% for review in reviews %}
-            <div id="review-{{ review.id }}" class="{% if not forloop.first %}hidden{% endif %} w-full p-4 border-4 border-solid rounded-lg text-gray-950">
-                <div>
-                    {% if review.reviewpro_set.all %}
+            <div>
+                {% for review in reviews %}
+                <div id="review-{{ review.id }}" class="{% if not forloop.first %}hidden{% endif %} w-full border-solid rounded-lg text-gray-950">
                     <div>
-                        <h3 class="font-semibold text-xl mb-2">Pros:</h3>
-                        <ul class="list-disc list-inside">
-                            {% for pro in review.reviewpro_set.first.pros %}
-                            <li>{{ pro }}</li>
-                            {% endfor %}
-                        </ul>
+                        <!-- Update your pros/cons sections -->
+                        <div  class="block pros-section">
+                            {% if review.reviewpro_set.all %}
+                            <div>
+                                <ul class="list-disc list-inside">
+                                    {% for pro in review.reviewpro_set.first.pros %}
+                                    <li class="list-none text-md">{{ pro }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="hidden cons-section">
+                            {% if review.reviewcon_set.all %}
+                            <div>
+                                <ul class="list-disc list-inside">
+                                    {% for con in review.reviewcon_set.first.cons %}
+                                    <li class="list-none text-md">{{ con }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    {% endif %}
-
-                    {% if review.reviewcon_set.all %}
-                    <div>
-                        <h3 class="font-semibold text-xl mb-2">Cons:</h3>
-                        <ul class="list-disc list-inside">
-                            {% for con in review.reviewcon_set.first.cons %}
-                            <li>{{ con }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
+                    <p class="italic">Robo Score: {{review.robo_score}}</p>
                 </div>
+                {% endfor %}
+                <button id="showPros" class="px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold" onclick="toggleProsCons('pros')">Pros</button>
+                <button id="showCons" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold" onclick="toggleProsCons('cons')">Cons</button>
+                <p class="text-gray-500 text-sm">*Robo Score / Pros and Cons generated by AI based on content of review.</p>
             </div>
-            {% endfor %}
-        </div>
     </div>
-
-    <!-- Bottom section: Video -->
-        <iframe 
-            class="w-full max-w-2xl h-auto aspect-video mt-8 rounded-lg shadow-lg"
-            src="{{ game.youtube_gameplay_url }}"
-            title="{{ game.title }} Gameplay"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen>
-        </iframe>
+    <iframe 
+    class="w-full max-w-3xl h-auto aspect-video mt-8 rounded-lg shadow-lg"
+    src="{{ game.youtube_gameplay_url }}"
+    title="{{ game.title }} Gameplay"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+</iframe>
 </div>
 
 <script>
@@ -110,6 +108,48 @@
         review.classList.remove('hidden');
         clickedElement.classList.remove('border-gray-200');
         clickedElement.classList.add('border-blue-400');
+        toggleProsCons('pros');
+    }
+
+    function toggleProsCons(section) {
+        const prosButton = document.getElementById('showPros');
+        const consButton = document.getElementById('showCons');
+        const prosSections = document.querySelectorAll('.pros-section');
+        const consSections = document.querySelectorAll('.cons-section');
+
+        if (section === 'pros') {
+            // Show pros, hide cons
+            prosSections.forEach(section => {
+                section.classList.remove('hidden');
+                section.classList.add('block');
+            });
+            consSections.forEach(section => {
+                section.classList.add('hidden');
+                section.classList.remove('block');
+            });
+            
+            // Update button styles
+            prosButton.classList.remove('bg-gray-200', 'text-gray-700');
+            prosButton.classList.add('bg-blue-500', 'text-white');
+            consButton.classList.remove('bg-blue-500', 'text-white');
+            consButton.classList.add('bg-gray-200', 'text-gray-700');
+        } else {
+            // Show cons, hide pros
+            consSections.forEach(section => {
+                section.classList.remove('hidden');
+                section.classList.add('block');
+            });
+            prosSections.forEach(section => {
+                section.classList.add('hidden');
+                section.classList.remove('block');
+            });
+            
+            // Update button styles
+            consButton.classList.remove('bg-gray-200', 'text-gray-700');
+            consButton.classList.add('bg-blue-500', 'text-white');
+            prosButton.classList.remove('bg-blue-500', 'text-white');
+            prosButton.classList.add('bg-gray-200', 'text-gray-700');
+        }
     }
 </script>
 {% endblock %}
