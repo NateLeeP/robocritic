@@ -2,6 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 from typing import List, Dict, Any
 import logging
+import datetime
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -61,6 +62,10 @@ class RobocriticDBReader:
     def get_all_games(self) -> List[Dict[str, Any]]:
         query = "SELECT * FROM game"
         return self._execute_query(query)
+    
+    def get_games_after_release_date(self, release_date: datetime.date) -> List[Dict[str, Any]]:
+        query = "SELECT * FROM game WHERE release_date >= %s"
+        return self._execute_query(query, (release_date,))
 
     def get_all_reviews(self) -> List[Dict[str, Any]]:
         query = "SELECT * FROM review"
@@ -91,4 +96,8 @@ class RobocriticDBReader:
     def get_reviewer_by_name_and_publisher(self, reviewer_full_name: str, publisher_id: int) -> Dict[str, Any]:
         query = "SELECT * FROM reviewer WHERE reviewer_full_name = %s AND publisher_id = %s"
         result = self._execute_query(query, (reviewer_full_name, publisher_id))
+        return result[0] if result else {}
+    def get_publisher_by_id(self, publisher_id: int) -> Dict[str, Any]:
+        query = "SELECT * FROM publisher WHERE id = %s"
+        result = self._execute_query(query, (publisher_id,))
         return result[0] if result else {}

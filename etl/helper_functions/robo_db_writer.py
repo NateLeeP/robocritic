@@ -77,7 +77,7 @@ class RoboCriticDBWriter:
         
         Args:
         game_id (int): The ID of the game to update
-        **fields_to_update:  Possible fields: title, release_date, art_url, youtube_gameplay_url
+        **fields_to_update:  Possible fields: title, release_date, art_url, youtube_gameplay_url, average_critic_score
     
         Returns:
             bool: True if update was successful, False otherwise
