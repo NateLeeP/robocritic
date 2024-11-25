@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Game, Review
+from datetime import date, timedelta, datetime
 
 
 def index(request):
-    games = Game.objects.all()
+    cutoff_date = datetime.now() - timedelta(days=70)
+    games = Game.objects.filter(release_date__gte=cutoff_date.date())
     return render(request, "robocritic/index.html", {"games": games})
 
 
