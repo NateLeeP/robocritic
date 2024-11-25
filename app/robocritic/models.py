@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Game(models.Model):
     # Primary keys automatic - adding for readability
     id = models.BigAutoField(primary_key=True)
@@ -15,8 +16,9 @@ class Game(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'game'
-        ordering = ['-release_date']
+        db_table = "game"
+        ordering = ["-release_date"]
+
 
 class Platform(models.Model):
     # Primary keys automatic - adding for readability
@@ -29,17 +31,19 @@ class Platform(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'platform'
+        db_table = "platform"
+
 
 class PlatformGame(models.Model):
     # Primary keys automatic - adding for readability
     id = models.BigAutoField(primary_key=True)
     platform = models.ForeignKey(Platform, on_delete=models.DO_NOTHING)
-    game = models.ForeignKey(Game, on_delete=models.DO_NOTHING)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
     class Meta:
         managed = False
-        db_table = 'platform_game'
+        db_table = "platform_game"
+
 
 class Publisher(models.Model):
     # Primary keys automatic - adding for readability
@@ -54,7 +58,7 @@ class Publisher(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'publisher'
+        db_table = "publisher"
 
 
 class Reviewer(models.Model):
@@ -69,7 +73,8 @@ class Reviewer(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'reviewer'
+        db_table = "reviewer"
+
 
 class Review(models.Model):
     # Primary keys automatic - adding for readability
@@ -78,7 +83,7 @@ class Review(models.Model):
     robo_score = models.DecimalField(max_digits=3, decimal_places=1)
     critic_score = models.DecimalField(max_digits=3, decimal_places=1)
     reviewer = models.ForeignKey(Reviewer, on_delete=models.DO_NOTHING)
-    game = models.ForeignKey(Game, on_delete=models.DO_NOTHING)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
     publisher = models.ForeignKey(Publisher, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -87,24 +92,27 @@ class Review(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'review'
-        ordering = ['-created_at']
+        db_table = "review"
+        ordering = ["-created_at"]
+
+
 class ReviewPro(models.Model):
     # Primary keys automatic - adding for readability
     id = models.BigAutoField(primary_key=True)
-    review = models.ForeignKey(Review, on_delete=models.DO_NOTHING)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE)
     pros = models.JSONField(default=list, null=True)
 
     class Meta:
         managed = False
-        db_table = 'review_pro'
+        db_table = "review_pro"
+
 
 class ReviewCon(models.Model):
     # Primary keys automatic - adding for readability
     id = models.BigAutoField(primary_key=True)
-    review = models.ForeignKey(Review, on_delete=models.DO_NOTHING)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE)
     cons = models.JSONField(default=list, null=True)
 
     class Meta:
         managed = False
-        db_table = 'review_con'
+        db_table = "review_con"
