@@ -3,6 +3,10 @@
 {% block content %}
 
 <div class="container mx-auto p-6">
+    <form class="flex justify-end my-2" method="GET" action="/">
+        <input class="p-2 rounded-full text-gray-950" type="search" name="search_query" value="" style="margin: 0;"
+            placeholder="&#128270; Search">
+    </form>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {% for game in games %}
         <a href="{% url 'review' game.id %}">
