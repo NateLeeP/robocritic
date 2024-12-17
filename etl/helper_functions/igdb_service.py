@@ -27,6 +27,8 @@ class IGDBService:
         Returns datetime 'date' object.
         """
         try:
+            # Replace apostrophes with standard apostrophe
+            title = title.replace("\u2019", "'")
             request_data = (
                 f'search "{title}"; fields name, platforms.name, first_release_date;'
             )

@@ -12,7 +12,7 @@ class YoutubeApi:
         response = requests.get('https://youtube.googleapis.com/youtube/v3/search',
                                 params={
                                     'key': self.api_key,
-                                    'q': game_title + ' gameplay walkthrough no commentary',
+                                    'q': game_title + ' gameplay no commentary',
                                     'part': 'snippet',
                                     'type': 'video',
                                     'maxResults': 1
