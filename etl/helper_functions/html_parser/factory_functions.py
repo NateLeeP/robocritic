@@ -7,12 +7,21 @@ from .base import AbstractHTMLParser
 import requests
 from bs4 import BeautifulSoup
 import re
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 # Import other parsers as needed    
 
 header_mapping = {"User-Agent": "Mac Firefox"}
 
+proxies = {
+    "http": os.getenv('MARS_PROXY_CONNECTION'),
+    "https": os.getenv('MARS_PROXY_CONNECTION')
+}
+
 def fetch_html(url):
-    response = requests.get(url, headers=header_mapping)
+    response = requests.get(url, headers=header_mapping, proxies=proxies)
     return response.content
 
 def get_pcgamer_review_urls(soup):

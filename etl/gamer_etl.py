@@ -18,9 +18,13 @@ publisher = os.getenv('PUBLISHER')
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+proxies = {
+    "http": os.getenv('MARS_PROXY_CONNECTION'),
+    "https": os.getenv('MARS_PROXY_CONNECTION')
+}
 
 def fetch_html(url):
-    response = requests.get(url, headers={"User-Agent": "Mac Firefox"})
+    response = requests.get(url, headers={"User-Agent": "Mac Firefox"}, proxies=proxies)
     return response.content
 
 def extract_review_details(html_content):
