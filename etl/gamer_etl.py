@@ -106,8 +106,7 @@ def main():
                 logger.info(f"Rolling back transaction, continuing with next review")
                 continue
         try:
-            # youtube_gameplay_url = YoutubeApi().search_for_gameplay_videos(game_title)
-            youtube_gameplay_url = None
+            youtube_gameplay_url = YoutubeApi().search_for_gameplay_videos(game_title)
         except requests.exceptions.HTTPError as e:
             logger.error(f'{e}')
             youtube_gameplay_url = None
