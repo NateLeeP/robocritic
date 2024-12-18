@@ -9,6 +9,7 @@ class Game(models.Model):
     art_url = models.CharField(max_length=200)
     youtube_gameplay_url = models.CharField(max_length=200, blank=True, null=True)
     critic_score_average = models.IntegerField(blank=True, null=True)
+    normalized_title = models.CharField(max_length=100, blank=True, null=True, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
