@@ -22,7 +22,12 @@ class GameSpotReviewParser(AbstractHTMLParser):
 
     def get_game_title(self):
         try:
-            review_title = self.soup.find('h1', class_='kubrick-info__title').get_text(strip=True)
+            
+            review_title = self.soup.find('h1').get_text(strip=True)
+
+            # Remove 'Early Access' from the review title
+            review_title = review_title.replace('Early Access', '')
+
             # Find the index of 'remake' or 'review', whichever comes first (case-insensitive)
             index = next((i for i, word in enumerate(review_title.lower().split()) if word in ['review']), -1)
             if index != -1:

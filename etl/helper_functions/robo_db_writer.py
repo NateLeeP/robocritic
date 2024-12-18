@@ -6,13 +6,13 @@ class RoboCriticDBWriter:
     def __init__(self, connection: mysql.connector.connection.MySQLConnection) -> None:
         self.connection = connection
 
-    def write_game(self, title: str, release_date: date, art_url: str) -> None:
+    def write_game(self, title: str, release_date: date, art_url: str, normalized_title: str) -> None:
         cursor = self.connection.cursor()
         query = """
-        INSERT INTO game (title, release_date, art_url)
-        VALUES (%s, %s, %s)
+        INSERT INTO game (title, release_date, art_url, normalized_title)
+        VALUES (%s, %s, %s, %s)
         """
-        cursor.execute(query, (title, release_date, art_url))
+        cursor.execute(query, (title, release_date, art_url, normalized_title))
         game_id = cursor.lastrowid
         cursor.close()
         return game_id

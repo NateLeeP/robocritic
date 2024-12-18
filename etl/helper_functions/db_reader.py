@@ -101,3 +101,8 @@ class RobocriticDBReader:
         query = "SELECT * FROM publisher WHERE id = %s"
         result = self._execute_query(query, (publisher_id,))
         return result[0] if result else {}
+    
+    def get_game_by_normalized_title(self, normalized_title: str) -> Dict[str, Any]:
+        query = "SELECT * FROM game WHERE normalized_title = %s"
+        result = self._execute_query(query, (normalized_title,))
+        return result[0] if result else {}

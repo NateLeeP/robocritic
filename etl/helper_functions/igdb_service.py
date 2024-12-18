@@ -55,8 +55,10 @@ class IGDBService:
         release_date_unix = game.get("first_release_date")
         platforms = [platform.get('name') for platform in game.get('platforms', [])]
         platforms = [platform for platform in platforms if platform in self.reviewable_platforms]
-        if not release_date_unix or not platforms:
-            raise ValueError(f"No release date and /or platforms found for title '{title}'")
+        if not release_date_unix:
+            raise ValueError(f"No first release date found for title '{title}'")
+        if not platforms:
+            raise ValueError(f"No reviewable platforms found for title '{title}'")
         release_date = datetime.fromtimestamp(release_date_unix).date()
 
         return release_date, platforms

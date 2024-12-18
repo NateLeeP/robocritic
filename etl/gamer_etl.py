@@ -8,6 +8,7 @@ from helper_functions.robo_db_writer import RoboCriticDBWriter
 from helper_functions.giant_bomb_api import GiantBombAPI
 from helper_functions.youtube_api import YoutubeApi
 from helper_functions.html_parser.factory_functions import get_review_urls, get_parser
+from helper_functions.utils import normalize_game_title
 import json
 import logging
 from dotenv import load_dotenv
@@ -69,12 +70,14 @@ def main():
         review_text, game_title, critic_score = extract_review_details(review_html)
         reviewer_name, reviewer_bio_url = extract_reviewer_details(review_html)
 
+        normalized_game_title = normalize_game_title(game_title)
+
 
         if not review_text or not game_title or not critic_score:
             logger.info(f"Skipping review {review_url} as it is missing required fields")
             continue
         
-        game = db_reader.get_game_by_title(game_title)
+        game = db_reader.get_game_by_normalized_title(normalized_game_title)
         game_id = game.get('id')
         if not game:
             try:
@@ -90,7 +93,7 @@ def main():
                 art_url = 'placeholder_value'
             
             try:
-                game_id = db_writer.write_game(game_title, release_date, art_url)
+                game_id = db_writer.write_game(game_title, release_date, art_url, normalized_game_title)
                 for platform in platforms:
                     platform_id = platform_id_map[platform]
                     db_writer.write_platform_game(platform_id, game_id)
@@ -103,7 +106,8 @@ def main():
                 logger.info(f"Rolling back transaction, continuing with next review")
                 continue
         try:
-            youtube_gameplay_url = YoutubeApi().search_for_gameplay_videos(game_title)
+            # youtube_gameplay_url = YoutubeApi().search_for_gameplay_videos(game_title)
+            youtube_gameplay_url = None
         except requests.exceptions.HTTPError as e:
             logger.error(f'{e}')
             youtube_gameplay_url = None
