@@ -59,6 +59,7 @@ def validate_log_value(value, log_type):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("path_to_log_file", type=str)
+    parser.add_argument("date", type=str)
     args = parser.parse_args()
     parsed_data = []
     with open(args.path_to_log_file, "r") as f:
@@ -91,9 +92,7 @@ def main():
             parsed_data.append(values)
 
     # Create filename with yesterday's date
-    yesterday = datetime.now() - timedelta(days=1)
-    yesterday_string = yesterday.strftime("%Y%m%d")
-    filename = path.expanduser(f"~/site_visits_{yesterday_string}.txt")
+    filename = path.expanduser(f"~/site_visits_{args.date}.txt")
 
     # Write parsed data to file
     with open(filename, "w") as output_file:
