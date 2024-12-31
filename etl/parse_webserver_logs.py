@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime, timedelta
+from os import path
 
 # TODO
 # Create a dictionary of the parsed data. See notion for example
@@ -62,7 +63,6 @@ def main():
     parsed_data = []
     with open(args.path_to_log_file, "r") as f:
         for line in f:
-            print(line)
             # Process line. Values are separated by spaces, except when the spaces are in quotes.
             # We need to split the line into values, taking into account the quotes.
             values = []
@@ -90,11 +90,10 @@ def main():
                 continue
             parsed_data.append(values)
 
-        print(parsed_data)
     # Create filename with yesterday's date
     yesterday = datetime.now() - timedelta(days=1)
     yesterday_string = yesterday.strftime("%Y%m%d")
-    filename = f"./site_visits_{yesterday_string}.txt"
+    filename = path.expanduser(f"~/site_visits_{yesterday_string}.txt")
 
     # Write parsed data to file
     with open(filename, "w") as output_file:
