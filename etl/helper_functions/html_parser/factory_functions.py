@@ -1,8 +1,8 @@
-
 from .pcgamer import PCGamerGameReviewParser
 from .ign import IGNGameReviewParser
 from .gamespot import GameSpotReviewParser
 from .gamerant import GameRantGameReviewParser
+from .eurogamer import EurogamerGameReviewParser
 from .base import AbstractHTMLParser
 import requests
 from bs4 import BeautifulSoup
@@ -91,18 +91,33 @@ def get_gamerant_review_urls(soup):
     review_urls = set(review_urls)
     return list(review_urls)
 
+def get_eurogamer_review_urls(soup):
+    review_urls = []
+    
+    for title in soup.find_all('h2', class_='archive__title'):
+        link = title.find('a')
+        if link and 'href' in link.attrs:
+            url = link['href']
+            # Filter out digitalfoundry and film reviews
+            if 'digitalfoundry' not in url.lower() and not url.endswith('film-review'):
+                review_urls.append(url)
+    
+    return review_urls
+
 publisher_url_map = {
     'pcgamer': 'https://www.pcgamer.com/reviews/',
     "ign": "https://www.ign.com/reviews/games",
     "gamespot": "https://www.gamespot.com/games/reviews/",
-    "gamerant": "https://gamerant.com/game-reviews/"
+    "gamerant": "https://gamerant.com/game-reviews/",
+    'eurogamer': 'https://www.eurogamer.net/reviews'
 }
 
 publisher_parser_function_map = {
     'pcgamer': get_pcgamer_review_urls,
     'ign': get_ign_review_urls,
     "gamespot": get_gamespot_review_urls,
-    "gamerant": get_gamerant_review_urls
+    "gamerant": get_gamerant_review_urls,
+    'eurogamer': get_eurogamer_review_urls
 }
 
 
@@ -125,7 +140,8 @@ def get_parser(source: str, html_content: str) -> AbstractHTMLParser:
         'pcgamer': PCGamerGameReviewParser,
         'ign': IGNGameReviewParser,
         'gamespot': GameSpotReviewParser,
-        "gamerant": GameRantGameReviewParser
+        "gamerant": GameRantGameReviewParser,
+        "eurogamer": EurogamerGameReviewParser
         # Add other sources and their corresponding parser classes here
     }
 
